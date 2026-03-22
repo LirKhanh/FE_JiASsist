@@ -1,0 +1,99 @@
+<div class="container dashboard-container">
+  <div class="row">
+    <!-- Board 1: Recent Issues -->
+    <div class="col-6">
+      <div class="card">
+        <h3>Recent Issues</h3>
+        <table class="jira-table">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Summary</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (issue of recentIssues; track issue.key) {
+              <tr>
+                <td><a href="#" class="issue-link">{{ issue.key }}</a></td>
+                <td>{{ issue.summary }}</td>
+                <td><span class="status-badge">{{ issue.status }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Board 2: Assigned to Me -->
+    <div class="col-6">
+      <div class="card">
+        <h3>Assigned to Me</h3>
+        <table class="jira-table">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Summary</th>
+              <th>Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (issue of assignedToMe; track issue.key) {
+              <tr>
+                <td><a href="#" class="issue-link">{{ issue.key }}</a></td>
+                <td>{{ issue.summary }}</td>
+                <td>{{ issue.priority }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Board 3: Projects -->
+    <div class="col-6">
+      <div class="card">
+        <h3>My Projects</h3>
+        <table class="jira-table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Lead</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of projects; track p.name) {
+              <tr>
+                <td><strong class="project-name">{{ p.name }}</strong></td>
+                <td>{{ p.lead }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Board 4: Activity Stream -->
+    <div class="col-6">
+      <div class="card">
+        <h3>Activity Stream</h3>
+        <table class="jira-table">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of updates; track u.target) {
+              <tr>
+                <td><strong>{{ u.user }}</strong> {{ u.action }} <em>{{ u.target }}</em></td>
+                <td class="activity-time">{{ u.time }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<app-notification></app-notification>
+
+<header *ngIf="showMenu" style="background: var(--primary-color); padding: 10px 20px; color: white;">
+  <div class="d-flex justify-between align-center flex-wrap gap-20">
+    <div class="d-flex align-center gap-20">
+      <div style="display: flex; align-items: center;">
+        <img src="/image/web_logo.png" alt="Logo" style="height: 50px;">
+      </div>
+      <nav class="d-flex gap-20" style="margin-left: 20px;">
+        <a routerLink="/dashboard" style="color: white; text-decoration: none; font-size: 14px; font-weight: 500;" class="nav-item">Dashboard</a>
+        <a routerLink="/dashboard" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; font-weight: 500;" class="nav-item">Projects</a>
+        <a routerLink="/dashboard" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; font-weight: 500;" class="nav-item">Issues</a>
+        <a routerLink="/admin" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; font-weight: 500;" class="nav-item">Administrator</a>
+      </nav>
+      <button class="btn btn-create" style="margin-left: 10px;">Create</button>
+    </div>
+    
+    <div class="d-flex align-center gap-20">
+      <div style="font-size: 14px;">Hi, Admin</div>
+      <button (click)="logout()" class="btn" style="background: rgba(255,255,255,0.1); color: white;">Logout</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <router-outlet></router-outlet>
+</main>

@@ -1,0 +1,9 @@
+.nav-item:hover {
+  border-bottom: 2px solid var(--secondary-color);
+  color: white !important;
+}
+
+main {
+  min-height: calc(100vh - 60px);
+  background-color: var(--bg-color);
+}

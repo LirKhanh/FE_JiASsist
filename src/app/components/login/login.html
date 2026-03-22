@@ -1,0 +1,43 @@
+<div class="login-wrapper">
+  <div class="login-box">
+    <div class="login-header">
+      <img src="/image/web_logo.png" alt="Logo" class="logo">
+      <h2>Login</h2>
+    </div>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-control">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          formControlName="username" 
+          placeholder="Enter username"
+          [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+        >
+        <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.errors" class="error-msg">
+          <small *ngIf="loginForm.get('username')?.errors?.['required']">Username is required.</small>
+        </div>
+      </div>
+      <div class="form-control">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          placeholder="Enter password"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        >
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors" class="error-msg">
+          <small *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</small>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-full" [disabled]="loading">
+        <span *ngIf="!loading">Log in</span>
+        <span *ngIf="loading">Logging in...</span>
+      </button>
+    </form>
+    <div class="login-footer">
+      <p>Don't have an account? <a routerLink="/register">Sign up</a></p>
+    </div>
+  </div>
+</div>
