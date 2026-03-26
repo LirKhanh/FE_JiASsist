@@ -28,7 +28,7 @@ export interface LoginData {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = '/api/Auth';
+  private apiUrl = '/api/Authentication';
 
   constructor(private http: HttpClient) { }
 

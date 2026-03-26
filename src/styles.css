@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Global variables for Modern Blue & White theme */
 :root {
   --primary-color: #0065FF;    /* Modern Azure Blue */
@@ -14,16 +18,10 @@
   --card-shadow: 0 4px 12px rgba(9, 30, 66, 0.08);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  background-color: var(--bg-color) !important;
+  color: var(--text-primary) !important;
   line-height: 1.6;
 }
 

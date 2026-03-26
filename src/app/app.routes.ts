@@ -7,6 +7,7 @@ import { AdminComponent } from './components/admin/admin';
 import { AccountManagementComponent } from './components/admin/account-management/account-management';
 import { RoleManagementComponent } from './components/admin/role-management/role-management';
 import { ProjectManagementComponent } from './components/admin/project-management/project-management';
+import { WorkflowManagementComponent } from './components/admin/workflow-management/workflow-management';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [loginGuard] },
@@ -24,6 +25,7 @@ export const routes: Routes = [
       { path: 'accounts', component: AccountManagementComponent },
       { path: 'roles', component: RoleManagementComponent },
       { path: 'projects', component: ProjectManagementComponent },
+      { path: 'workflow', component: WorkflowManagementComponent },
       { path: '', redirectTo: 'accounts', pathMatch: 'full' }
     ]
   },

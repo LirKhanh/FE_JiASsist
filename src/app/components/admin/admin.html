@@ -1,29 +1,47 @@
-<div class="admin-layout">
-  <aside class="admin-sidebar">
-    <div class="sidebar-header">
-      <h3>Administrator</h3>
+<div class="flex min-h-[calc(100vh-64px)] bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-72 bg-white border-r border-border shadow-sm flex-shrink-0">
+    <div class="p-6 border-b border-border bg-gray-50/50">
+      <h3 class="text-lg font-bold text-text-primary flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Administrator
+      </h3>
     </div>
-    <nav class="sidebar-nav">
-      <ul>
-        <li>
-          <a routerLink="/admin/accounts" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-            <span class="icon">👤</span> Quản trị tài khoản
-          </a>
-        </li>
-        <li>
-          <a routerLink="/admin/roles" routerLinkActive="active">
-            <span class="icon">🔑</span> Quản trị vai trò
-          </a>
-        </li>
-        <li>
-          <a routerLink="/admin/projects" routerLinkActive="active">
-            <span class="icon">📁</span> Quản trị dự án
-          </a>
-        </li>
-      </ul>
+    <nav class="p-4 space-y-1">
+      <a routerLink="/admin/accounts" routerLinkActive="bg-blue-50 text-primary border-r-4 border-primary shadow-sm" [routerLinkActiveOptions]="{exact: true}" class="flex items-center px-4 py-3 text-sm font-semibold text-text-secondary hover:bg-gray-50 hover:text-text-primary rounded-lg transition-all group">
+        <span class="mr-3 text-lg group-hover:scale-110 transition-transform">👤</span>
+        Quản trị tài khoản
+      </a>
+      <a routerLink="/admin/roles" routerLinkActive="bg-blue-50 text-primary border-r-4 border-primary shadow-sm" class="flex items-center px-4 py-3 text-sm font-semibold text-text-secondary hover:bg-gray-50 hover:text-text-primary rounded-lg transition-all group">
+        <span class="mr-3 text-lg group-hover:scale-110 transition-transform">🔑</span>
+        Quản trị vai trò
+      </a>
+      <a routerLink="/admin/projects" routerLinkActive="bg-blue-50 text-primary border-r-4 border-primary shadow-sm" class="flex items-center px-4 py-3 text-sm font-semibold text-text-secondary hover:bg-gray-50 hover:text-text-primary rounded-lg transition-all group">
+        <span class="mr-3 text-lg group-hover:scale-110 transition-transform">📁</span>
+        Quản trị dự án
+      </a>
+      <a routerLink="/admin/workflow" routerLinkActive="bg-blue-50 text-primary border-r-4 border-primary shadow-sm" class="flex items-center px-4 py-3 text-sm font-semibold text-text-secondary hover:bg-gray-50 hover:text-text-primary rounded-lg transition-all group">
+        <span class="mr-3 text-lg group-hover:scale-110 transition-transform">🔄</span>
+        Quản trị Workflow
+      </a>
     </nav>
+    
+    <div class="absolute bottom-0 w-72 p-6 border-t border-border bg-gray-50/50">
+      <div class="flex items-center text-xs text-text-secondary font-medium uppercase tracking-wider mb-2">System Status</div>
+      <div class="flex items-center space-x-2">
+        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+        <span class="text-xs font-bold text-text-primary uppercase">All Systems Operational</span>
+      </div>
+    </div>
   </aside>
-  <main class="admin-content">
-    <router-outlet></router-outlet>
+
+  <!-- Content -->
+  <main class="flex-grow p-8 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-border p-8 min-h-full">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>

@@ -1,43 +1,66 @@
-<div class="login-wrapper">
-  <div class="login-box">
-    <div class="login-header">
-      <img src="/image/web_logo.png" alt="Logo" class="logo">
-      <h2>Login</h2>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-blue-400 p-4">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-auto max-w-md transform transition-all duration-300 hover:scale-[1.01]">
+    <div class="text-center mb-10">
+      <img src="/image/web_logo.png" alt="Logo" class="h-20 mx-auto mb-6">
+      <h2 class="text-3xl font-bold text-text-primary tracking-tight">Welcome Back</h2>
+      <p class="text-text-secondary mt-2">Log in to your JiASsist account</p>
     </div>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="form-control">
-        <label for="username">Username</label>
-        <input 
-          type="text" 
-          id="username" 
-          formControlName="username" 
-          placeholder="Enter username"
-          [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
-        >
-        <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.errors" class="error-msg">
-          <small *ngIf="loginForm.get('username')?.errors?.['required']">Username is required.</small>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div class="space-y-2">
+        <label for="username" class="text-sm font-semibold text-text-primary block">Username</label>
+        <div class="relative">
+          <input 
+            type="text" 
+            id="username" 
+            formControlName="username" 
+            placeholder="Enter username"
+            class="w-full px-4 py-3 bg-gray-50 border-2 border-border rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-text-primary"
+            [class.border-red-500]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+          >
+        </div>
+        <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.errors" class="text-red-500 text-xs font-medium animate-pulse">
+          <span *ngIf="loginForm.get('username')?.errors?.['required']">Username is required.</span>
         </div>
       </div>
-      <div class="form-control">
-        <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          formControlName="password" 
-          placeholder="Enter password"
-          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-        >
-        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors" class="error-msg">
-          <small *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</small>
+
+      <div class="space-y-2">
+        <label for="password" class="text-sm font-semibold text-text-primary block">Password</label>
+        <div class="relative">
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            placeholder="Enter password"
+            class="w-full px-4 py-3 bg-gray-50 border-2 border-border rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-text-primary"
+            [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          >
+        </div>
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors" class="text-red-500 text-xs font-medium animate-pulse">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</span>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary w-full" [disabled]="loading">
-        <span *ngIf="!loading">Log in</span>
-        <span *ngIf="loading">Logging in...</span>
+
+      <button 
+        type="submit" 
+        class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-lg shadow-lg hover:shadow-xl transform active:scale-95 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
+        [disabled]="loading"
+      >
+        <span *ngIf="!loading">Log In</span>
+        <span *ngIf="loading" class="flex items-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Logging in...
+        </span>
       </button>
     </form>
-    <div class="login-footer">
-      <p>Don't have an account? <a routerLink="/register">Sign up</a></p>
+
+    <div class="mt-10 pt-6 border-t border-gray-100 text-center">
+      <p class="text-text-secondary">Don't have an account? 
+        <a routerLink="/register" class="font-bold text-primary hover:text-primary-hover hover:underline transition-all">Sign up now</a>
+      </p>
     </div>
   </div>
 </div>

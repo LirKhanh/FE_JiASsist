@@ -1,93 +1,118 @@
-<div class="register-wrapper">
-  <div class="register-box">
-    <div class="register-header">
-      <img src="/image/web_logo.png" alt="Logo" class="logo">
-      <h2>Create Account</h2>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-blue-400 p-4 py-12">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition-all duration-300 hover:scale-[1.01]">
+    <div class="text-center mb-10">
+      <img src="/image/web_logo.png" alt="Logo" class="h-20 mx-auto mb-6">
+      <h2 class="text-3xl font-bold text-text-primary tracking-tight">Create Account</h2>
+      <p class="text-text-secondary mt-2">Join JiASsist to manage your projects effectively</p>
     </div>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <div class="form-control">
-        <label for="fullname">Full Name</label>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <!-- Full Name -->
+      <div class="space-y-2">
+        <label for="fullname" class="text-sm font-semibold text-text-primary block">Full Name</label>
         <input 
           type="text" 
           id="fullname" 
           formControlName="fullname" 
           placeholder="Enter your full name"
-          [class.error]="registerForm.get('fullname')?.invalid && registerForm.get('fullname')?.touched"
+          class="w-full px-4 py-3 bg-gray-50 border-2 border-border rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
+          [class.border-red-500]="registerForm.get('fullname')?.invalid && registerForm.get('fullname')?.touched"
         >
-        <div *ngIf="registerForm.get('fullname')?.touched && registerForm.get('fullname')?.errors" class="error-msg">
-          <small *ngIf="registerForm.get('fullname')?.errors?.['required']">Full name is required.</small>
+        <div *ngIf="registerForm.get('fullname')?.touched && registerForm.get('fullname')?.errors" class="text-red-500 text-xs font-medium">
+          <span *ngIf="registerForm.get('fullname')?.errors?.['required']">Full name is required.</span>
         </div>
       </div>
 
-      <div class="form-control">
-        <label for="email">Email</label>
+      <!-- Email -->
+      <div class="space-y-2">
+        <label for="email" class="text-sm font-semibold text-text-primary block">Email Address</label>
         <input 
           type="email" 
           id="email" 
           formControlName="email" 
           placeholder="Enter your email"
-          [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+          class="w-full px-4 py-3 bg-gray-50 border-2 border-border rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
+          [class.border-red-500]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
         >
-        <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.errors" class="error-msg">
-          <small *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</small>
-          <small *ngIf="registerForm.get('email')?.errors?.['email']">Invalid email format.</small>
+        <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.errors" class="text-red-500 text-xs font-medium">
+          <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
+          <span *ngIf="registerForm.get('email')?.errors?.['email']">Invalid email format.</span>
         </div>
       </div>
 
-      <div class="form-control">
-        <label for="username">Username</label>
-        <input 
-          type="text" 
-          id="username" 
-          formControlName="username" 
-          placeholder="Enter username"
-          [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
-        >
-        <div *ngIf="registerForm.get('username')?.touched && registerForm.get('username')?.errors" class="error-msg">
-          <small *ngIf="registerForm.get('username')?.errors?.['required']">Username is required.</small>
-          <small *ngIf="registerForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters.</small>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Username -->
+        <div class="space-y-2">
+          <label for="username" class="text-sm font-semibold text-text-primary block">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            formControlName="username" 
+            placeholder="Username"
+            class="w-full px-4 py-3 bg-gray-50 border-2 border-border rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
+            [class.border-red-500]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+          >
+          <div *ngIf="registerForm.get('username')?.touched && registerForm.get('username')?.errors" class="text-red-500 text-xs font-medium">
+            <span *ngIf="registerForm.get('username')?.errors?.['required']">Required.</span>
+            <span *ngIf="registerForm.get('username')?.errors?.['minlength']">Min 3 chars.</span>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-2">
+          <label for="password" class="text-sm font-semibold text-text-primary block">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            placeholder="Password"
+            class="w-full px-4 py-3 bg-gray-50 border-2 border-border rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
+            [class.border-red-500]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+          >
+          <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors" class="text-red-500 text-xs font-medium">
+            <span *ngIf="registerForm.get('password')?.errors?.['required']">Required.</span>
+            <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Min 6 chars.</span>
+          </div>
         </div>
       </div>
 
-      <div class="form-control">
-        <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          formControlName="password" 
-          placeholder="Enter password"
-          [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
-        >
-        <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors" class="error-msg">
-          <small *ngIf="registerForm.get('password')?.errors?.['required']">Password is required.</small>
-          <small *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters.</small>
-        </div>
-      </div>
-
-      <div class="form-control">
-        <label for="confirmPassword">Confirm Password</label>
+      <!-- Confirm Password -->
+      <div class="space-y-2">
+        <label for="confirmPassword" class="text-sm font-semibold text-text-primary block">Confirm Password</label>
         <input 
           type="password" 
           id="confirmPassword" 
           formControlName="confirmPassword" 
-          placeholder="Confirm password"
-          [class.error]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
+          placeholder="Confirm your password"
+          class="w-full px-4 py-3 bg-gray-50 border-2 border-border rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
+          [class.border-red-500]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
         >
-        <div *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.errors" class="error-msg">
-          <small *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Confirmation is required.</small>
-          <small *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match.</small>
+        <div *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.errors" class="text-red-500 text-xs font-medium">
+          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Confirmation is required.</span>
+          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match.</span>
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary w-full" [disabled]="(registerForm.touched && registerForm.invalid) || loading">
-        <span *ngIf="!loading">Sign Up</span>
-        <span *ngIf="loading">Registering...</span>
+      <button 
+        type="submit" 
+        class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-lg shadow-lg hover:shadow-xl transform active:scale-95 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed" 
+        [disabled]="(registerForm.touched && registerForm.invalid) || loading"
+      >
+        <span *ngIf="!loading">Create Account</span>
+        <span *ngIf="loading" class="flex items-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Registering...
+        </span>
       </button>
     </form>
 
-    <div class="register-footer">
-      <p>Already have an account? <a routerLink="/login">Log in</a></p>
+    <div class="mt-10 pt-6 border-t border-gray-100 text-center">
+      <p class="text-text-secondary">Already have an account? 
+        <a routerLink="/login" class="font-bold text-primary hover:text-primary-hover hover:underline transition-all">Log in here</a>
+      </p>
     </div>
   </div>
 </div>
