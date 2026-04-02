@@ -18,11 +18,11 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class BaseService {
-  private apiUrl = '/api/Base/LoadDataCombobox';
+  private apiUrl = '/api/Base/';
 
   constructor(private http: HttpClient) { }
 
   loadComboboxData(request: ComboboxRequest): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(this.apiUrl, request);
+    return this.http.post<ApiResponse<any>>(this.apiUrl+'LoadDataCombobox' , request);
   }
 }

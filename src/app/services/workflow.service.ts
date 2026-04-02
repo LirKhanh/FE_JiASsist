@@ -25,15 +25,17 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class WorkflowService {
-  private apiUrl = '/api/admin/Workflow/workflow';
+  private apiUrl = '/api/admin/Workflow/';
 
   constructor(private http: HttpClient) { }
 
   getWorkflows(): Observable<ApiResponse<WorkflowStep[]>> {
-    return this.http.get<ApiResponse<WorkflowStep[]>>(this.apiUrl);
+    return this.http.get<ApiResponse<WorkflowStep[]>>(this.apiUrl+ 'GetWorkFlow');
   }
 
-   saveWorkflow(workflow: Partial<WorkflowStep>): Observable<ApiResponse<WorkflowStep>> {                        
-       return this.http.post<ApiResponse<WorkflowStep>>(this.apiUrl, workflow);                                     
-  }    
+   saveWorkflow(data: Partial<WorkflowStep>): Observable<ApiResponse<WorkflowStep>> {                        
+       return this.http.post<ApiResponse<WorkflowStep>>(this.apiUrl+'AddOrEdit', data);                                     
+  }
+  
+  
 }

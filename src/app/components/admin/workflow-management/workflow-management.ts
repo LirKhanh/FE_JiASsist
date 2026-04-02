@@ -104,7 +104,7 @@ import { NotificationService } from '../../../services/notification.service';
                   <!-- ID -->
                   <div>
                     <label class="block text-sm font-bold text-text-secondary mb-1 uppercase tracking-wider">ID</label>
-                    <input type="text" [(ngModel)]="newStep.stepId" [disabled]="isEditMode" placeholder="VD: INPROGRESS, DONE..." 
+                    <input style="text-transform: uppercase;" type="text" [(ngModel)]="newStep.stepId" [disabled]="isEditMode" placeholder="VD: INPROGRESS, DONE..." 
                       class="w-full px-4 py-2.5 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium disabled:bg-gray-100 disabled:cursor-not-allowed">
                   </div>
 

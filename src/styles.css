@@ -1,6 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0065FF;
+  --color-primary-hover: #0052CC;
+  --color-secondary: #DEEBFF;
+  --color-bg: #F4F5F7;
+  --color-text-primary: #172B4D;
+  --color-text-secondary: #42526E;
+  --color-border: #DFE1E6;
+  --color-success: #36B37E;
+  --color-warning: #FFAB00;
+
+  --radius-jira: 8px;
+
+  --shadow-jira: 0 4px 12px rgba(9, 30, 66, 0.08);
+  --shadow-jira-hover: 0 8px 16px rgba(9, 30, 66, 0.12);
+}
 
 /* Global variables for Modern Blue & White theme */
 :root {

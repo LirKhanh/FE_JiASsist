@@ -16,7 +16,10 @@ export interface Project {
   updateBy: string;
   actionType?: string;
 }
-
+export interface ComboboxRequest {
+  queries: string[];
+  keys: string[];
+}
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -28,15 +31,18 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class ProjectService {
-  private apiUrl = '/api/admin/Project/project';
+  private apiUrl = '/api/admin/Project/';
 
   constructor(private http: HttpClient) { }
 
   getProjects(): Observable<ApiResponse<Project[]>> {
-    return this.http.get<ApiResponse<Project[]>>(this.apiUrl);
+    return this.http.get<ApiResponse<Project[]>>(this.apiUrl+'GetProject');
   }
 
-  saveProject(project: Partial<Project>): Observable<ApiResponse<Project>> {
-    return this.http.post<ApiResponse<Project>>(this.apiUrl, project);
+  saveProject(data: Partial<Project>): Observable<ApiResponse<Project>> {
+    return this.http.post<ApiResponse<Project>>(this.apiUrl+'AddOrEdit', data);
   }
+  loadComboboxData(request: ComboboxRequest): Observable<ApiResponse<any>> {
+      return this.http.post<ApiResponse<any>>(this.apiUrl+'LoadDataCombobox' , request);
+    }
 }

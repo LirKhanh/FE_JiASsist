@@ -68,7 +68,7 @@ import { NotificationService } from '../../../services/notification.service';
                 <td class="px-6 py-4 text-sm text-text-secondary">{{ (project.startDate || project.startDate) | date:'dd/MM/yyyy' }}</td>
                 <td class="px-6 py-4 text-sm text-text-secondary">{{ (project.endDate || project.endDate) | date:'dd/MM/yyyy' }}</td>
                 <td class="px-6 py-4">
-                  <span [class]="(project.status !== undefined ? project.status : project.status) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'" 
+                  <span [class]="(project.status !== undefined ? project.status : project.status) ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'" 
                         class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                     {{ (project.status !== undefined ? project.status : project.status) ? 'Hoạt động' : 'Tạm dừng' }}
                   </span>
@@ -103,7 +103,7 @@ import { NotificationService } from '../../../services/notification.service';
               <!-- Project ID -->
               <div>
                 <label class="block text-sm font-bold text-text-secondary mb-1 uppercase tracking-wider">Mã Dự án (ProjectId)</label>
-                <input type="text" [(ngModel)]="currentProject.projectId" [disabled]="isEditMode" placeholder="VD: PROJ001" 
+                <input type="text" style="text-transform: uppercase;" [(ngModel)]="currentProject.projectId" [disabled]="isEditMode" placeholder="VD: PROJ001" 
                   class="w-full px-4 py-2.5 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium disabled:bg-gray-100">
               </div>
 
@@ -125,10 +125,10 @@ import { NotificationService } from '../../../services/notification.service';
                 <!-- PM ID Select -->
                 <div>
                     <label class="block text-sm font-bold text-text-secondary mb-1 uppercase tracking-wider">Quản lý (PM)</label>
-                    <select [(ngModel)]="currentProject.pmId" class="w-full px-4 py-2.5 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium bg-white">
-                        <option value={{ (user.userId || user.UserId) }}>Chọn PM...</option>
-                        <option *ngFor="let user of PmUsers" [value]="user.userId || user.UserId">
-                          {{ (user.username || user.Username) }} - {{ (user.fullname || user.Fullname) }}
+                    <select [(ngModel)]="currentProject.pmId" name="pmId" class="w-full px-4 py-2.5 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium bg-white">
+                        <option [value]="''">Chọn PM...</option>
+                        <option *ngFor="let user of PmUsers" [value]="user.user_id">
+                          {{ user.username }} - {{ user.fullname }}
                         </option>
                     </select>
                 </div>
@@ -226,11 +226,11 @@ export class ProjectManagementComponent implements OnInit {
 
   loadPMUsers() {
     const request = {
-      queries: ["select * from users where role_id = 'PM'"],
+      queries: ["select * from users where pm_yn is true"],
       keys: ["users"]
     };
     
-    this.baseService.loadComboboxData(request).subscribe({
+    this.projectService.loadComboboxData(request).subscribe({
       next: (response) => {
         if (response.success && response.data && response.data.users) {
           this.PmUsers = response.data.users;
