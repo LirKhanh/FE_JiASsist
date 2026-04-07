@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ProjectService, Project } from '../../../services/project.service';
 import { BaseService } from '../../../services/base.service';
 import { NotificationService } from '../../../services/notification.service';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-project-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   styles: [`
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -56,21 +57,21 @@ import { NotificationService } from '../../../services/notification.service';
               </tr>
             </thead>
             <tbody class="divide-y divide-border">
-              <tr *ngIf="projects.length === 0" class="hover:bg-gray-50/50 transition-colors">
+              <tr *ngIf="paginatedProjects.length === 0" class="hover:bg-gray-50/50 transition-colors">
                 <td colspan="7" class="px-6 py-10 text-center text-text-secondary">
                   {{ isLoading ? 'Đang tải dữ liệu dự án...' : 'Không có dữ liệu dự án.' }}
                 </td>
               </tr>
-              <tr *ngFor="let project of projects" (click)="editProject(project)" class="hover:bg-gray-50/50 transition-colors cursor-pointer group">
-                <td class="px-6 py-4 text-sm font-bold text-primary">{{ project.projectId || project.projectId }}</td>
-                <td class="px-6 py-4 text-sm font-medium text-text-primary">{{ project.projectName || project.projectName }}</td>
-                <td class="px-6 py-4 text-sm text-text-secondary">{{ project.pmId || project.pmId }}</td>
-                <td class="px-6 py-4 text-sm text-text-secondary">{{ (project.startDate || project.startDate) | date:'dd/MM/yyyy' }}</td>
-                <td class="px-6 py-4 text-sm text-text-secondary">{{ (project.endDate || project.endDate) | date:'dd/MM/yyyy' }}</td>
+              <tr *ngFor="let project of paginatedProjects" (click)="editProject(project)" class="hover:bg-gray-50/50 transition-colors cursor-pointer group">
+                <td class="px-6 py-4 text-sm font-bold text-primary">{{ project.projectId }}</td>
+                <td class="px-6 py-4 text-sm font-medium text-text-primary">{{ project.projectName }}</td>
+                <td class="px-6 py-4 text-sm text-text-secondary">{{ project.pmId }}</td>
+                <td class="px-6 py-4 text-sm text-text-secondary">{{ project.startDate | date:'dd/MM/yyyy' }}</td>
+                <td class="px-6 py-4 text-sm text-text-secondary">{{ project.endDate | date:'dd/MM/yyyy' }}</td>
                 <td class="px-6 py-4">
-                  <span [class]="(project.status !== undefined ? project.status : project.status) ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'" 
+                  <span [class]="project.status ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'" 
                         class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                    {{ (project.status !== undefined ? project.status : project.status) ? 'Hoạt động' : 'Tạm dừng' }}
+                    {{ project.status ? 'Hoạt động' : 'Tạm dừng' }}
                   </span>
                 </td>
                 <td class="px-6 py-4">
@@ -84,6 +85,15 @@ import { NotificationService } from '../../../services/notification.service';
             </tbody>
           </table>
         </div>
+        
+        <!-- Pagination Component -->
+        <app-pagination 
+          *ngIf="projects.length > 0"
+          [totalItems]="projects.length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
       </div>
     </div>
 
@@ -193,6 +203,20 @@ export class ProjectManagementComponent implements OnInit {
   currentProject: Partial<Project> = {
     status: true
   };
+
+  // Pagination properties
+  currentPage: number = 1;
+  pageSize: number = 10;
+
+  get paginatedProjects(): Project[] {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.projects.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.cdr.detectChanges();
+  }
 
   constructor(
     private projectService: ProjectService,

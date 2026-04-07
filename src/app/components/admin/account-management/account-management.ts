@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountService, Account } from '../../../services/account.service';
 import { NotificationService } from '../../../services/notification.service';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-account-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   styles: [`
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -55,12 +56,12 @@ import { NotificationService } from '../../../services/notification.service';
               </tr>
             </thead>
             <tbody class="divide-y divide-border">
-              <tr *ngIf="accounts.length === 0" class="hover:bg-gray-50/50 transition-colors">
+              <tr *ngIf="paginatedAccounts.length === 0" class="hover:bg-gray-50/50 transition-colors">
                 <td colspan="7" class="px-6 py-10 text-center text-text-secondary">
                   {{ isLoading ? 'Đang tải dữ liệu tài khoản...' : 'Không có dữ liệu tài khoản.' }}
                 </td>
               </tr>
-              <tr *ngFor="let account of accounts" (click)="editAccount(account)" class="hover:bg-gray-50/50 transition-colors cursor-pointer group">
+              <tr *ngFor="let account of paginatedAccounts" (click)="editAccount(account)" class="hover:bg-gray-50/50 transition-colors cursor-pointer group">
                 <td class="px-6 py-4 text-sm font-bold text-primary">{{ account.userId }}</td>
                 <td class="px-6 py-4 text-sm font-medium text-text-primary">{{ account.username }}</td>
                 <td class="px-6 py-4 text-sm text-text-secondary">{{ account.fullname }}</td>
@@ -89,6 +90,15 @@ import { NotificationService } from '../../../services/notification.service';
             </tbody>
           </table>
         </div>
+        
+        <!-- Pagination Component -->
+        <app-pagination 
+          *ngIf="accounts.length > 0"
+          [totalItems]="accounts.length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
       </div>
     </div>
 
@@ -125,7 +135,7 @@ import { NotificationService } from '../../../services/notification.service';
               </div>
 
               <!-- Password -->
-              <div *ngIf="!isEditMode">
+              <div >
                 <label class="block text-sm font-bold text-text-secondary mb-1 uppercase tracking-wider">Mật khẩu</label>
                 <input type="password" [(ngModel)]="currentAccount.password" placeholder="Nhập mật khẩu..." 
                   class="w-full px-4 py-2.5 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium">
@@ -260,6 +270,20 @@ export class AccountManagementComponent implements OnInit {
     projectJoin: ''
   };
 
+  // Pagination properties
+  currentPage: number = 1;
+  pageSize: number = 10;
+
+  get paginatedAccounts(): Account[] {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.accounts.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.cdr.detectChanges();
+  }
+
   constructor(
     private accountService: AccountService,
     private notificationService: NotificationService,
@@ -318,7 +342,11 @@ export class AccountManagementComponent implements OnInit {
   }
 
   toggleProject(projectId: string) {
-    let selectedProjects = this.currentAccount.projectJoin ? this.currentAccount.projectJoin.split(',').filter(p => p.trim() !== '') : [];
+    let selectedProjects = this.currentAccount.projectJoin ? 
+      this.currentAccount.projectJoin.split(',')
+        .map(p => p.trim())
+        .filter(p => p !== '') : [];
+    
     const index = selectedProjects.indexOf(projectId);
     
     if (index > -1) {
@@ -333,12 +361,17 @@ export class AccountManagementComponent implements OnInit {
 
   isProjectSelected(projectId: string): boolean {
     if (!this.currentAccount.projectJoin) return false;
-    return this.currentAccount.projectJoin.split(',').includes(projectId);
+    return this.currentAccount.projectJoin.split(',')
+      .map(p => p.trim())
+      .includes(projectId);
   }
 
   getSelectedProjectNames(): string {
     if (!this.currentAccount.projectJoin) return 'Chọn dự án...';
-    const ids = this.currentAccount.projectJoin.split(',');
+    const ids = this.currentAccount.projectJoin.split(',')
+      .map(p => p.trim())
+      .filter(id => id !== '');
+      
     const names = this.projectOptions
       .filter(p => ids.includes(p.project_id))
       .map(p => p.project_name);
@@ -350,7 +383,7 @@ export class AccountManagementComponent implements OnInit {
     this.isProjectDropdownOpen = false;
     this.projectSearchTerm = '';
     this.currentAccount = {
-      userId: '',
+      userId: 'JiASsist',
       username: '',
       password: '',
       email: '',

@@ -8,6 +8,7 @@ import { AccountManagementComponent } from './components/admin/account-managemen
 import { ProjectManagementComponent } from './components/admin/project-management/project-management';
 import { WorkflowManagementComponent } from './components/admin/workflow-management/workflow-management';
 import { IssuesComponent } from './components/issues/issues';
+import { ProjectsComponent } from './components/projects/projects';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [loginGuard] },
@@ -15,6 +16,16 @@ export const routes: Routes = [
   { 
     path: 'dashboard', 
     component: DashboardComponent, 
+    canActivate: [authGuard] 
+  },
+  { 
+    path: 'projects', 
+    component: ProjectsComponent, 
+    canActivate: [authGuard] 
+  },
+  { 
+    path: 'projects/:projectId/issues/:issueId', 
+    component: IssuesComponent, 
     canActivate: [authGuard] 
   },
   { 

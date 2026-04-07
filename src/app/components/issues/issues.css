@@ -10,21 +10,92 @@
   overflow: hidden;
 }
 
-/* Custom scrollbar for Jira feel */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Modern Search Input Styles */
+.search-container {
+  flex-grow: 1;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #DFE1E6;
+.search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 54px 0 36px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1f2328;
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input::placeholder {
+  color: #636c76;
+}
+
+.search-input:hover {
+  background-color: #f3f4f6;
+  border-color: #afb8c1;
+}
+
+.search-input:focus {
+  background-color: #ffffff;
+  border-color: #0969da;
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+}
+
+.search-icon-box {
+  position: absolute;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #636c76;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.search-icon-box svg {
+  width: 16px;
+  height: 16px;
+}
+
+.search-wrapper:focus-within .search-icon-box {
+  color: #0969da;
+}
+
+.search-hint {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  gap: 2px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.search-hint kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #636c76;
+  background-color: #ffffff;
+  border: 1px solid #d0d7de;
   border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #B3BAC5;
+  box-shadow: inset 0 -1px 0 #d0d7de;
 }

@@ -1,0 +1,65 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-text-primary">Projects</h1>
+      <p class="text-text-secondary mt-1 text-sm">A list of all projects you are involved in.</p>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+
+  <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="bg-white rounded-xl shadow-jira border border-border overflow-hidden">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="text-text-secondary uppercase text-[10px] tracking-wider border-b border-border bg-gray-50">
+          <th class="px-6 py-4 font-bold">Project ID</th>
+          <th class="px-6 py-4 font-bold">Project Name</th>
+          <th class="px-6 py-4 font-bold">PM Name</th>
+          <th class="px-6 py-4 font-bold">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border">
+        <tr *ngFor="let project of projects" class="hover:bg-blue-50/30 transition-colors group">
+          <td class="px-6 py-4 font-semibold text-primary group-hover:underline">{{ project.projectId }}</td>
+          <td class="px-6 py-4 text-text-primary font-medium">{{ project.projectName }}</td>
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="h-7 w-7 rounded-full bg-secondary flex items-center justify-center text-primary text-[10px] font-bold border border-primary/20 mr-2">
+                {{ project.pmName.charAt(0) }}
+              </div>
+              <span class="text-text-primary">{{ project.pmName }}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <button (click)="viewProjectDetails(project.projectId)" class="p-2 hover:bg-primary/10 rounded-full transition-all text-primary group-hover:scale-110" title="View Details">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="projects.length === 0">
+          <td colspan="4" class="px-6 py-10 text-center text-text-secondary italic">
+            No projects found.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -18,11 +18,31 @@ export interface User {
   status: boolean;
 }
 
+export interface WorkflowStep {
+  stepId: string;
+  stepName: string;
+  step: number;
+}
+
+export interface IssuePriority {
+  priorityId: string;
+  priorityName: string;
+}
+
+export interface IssueTypes {
+  typeId: string;
+  typeName: string;
+}
+
 export interface LoginData {
   token: string;
   expiresAt: string;
   user: User;
+  workflowStep: WorkflowStep[];
+  issuePriorities: IssuePriority[];
+  issueTypes: IssueTypes[];
 }
+
 
 @Injectable({
   providedIn: 'root'
@@ -50,12 +70,18 @@ export class AuthService {
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     localStorage.setItem('expiresAt', data.expiresAt);
+    localStorage.setItem('workflowSteps', JSON.stringify(data.workflowStep));
+    localStorage.setItem('issuePriorities', JSON.stringify(data.issuePriorities));
+    localStorage.setItem('issueTypes', JSON.stringify(data.issueTypes));
   }
 
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('expiresAt');
+    localStorage.removeItem('workflowSteps');
+    localStorage.removeItem('issuePriorities');
+    localStorage.removeItem('issueTypes');
   }
 
   isLoggedIn(): boolean {
