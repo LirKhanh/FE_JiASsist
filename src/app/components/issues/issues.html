@@ -238,7 +238,7 @@
                     <!-- Preview Area -->
                     <div class="h-32 bg-gray-50 flex items-center justify-center overflow-hidden relative">
                       @if (isImage(attr.fileName)) {
-                        <img [src]="'/uploads/' + attr.fileName" 
+                        <img [src]="'https://localhost:44367/' + attr.filePath" 
                              class="w-full h-full object-cover transition-transform group-hover:scale-105" 
                              alt="Attachment">
                       } @else {
@@ -252,7 +252,7 @@
                       
                       <!-- Overlay Actions -->
                       <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
-                        <a [href]="'/uploads/' + attr.fileName" 
+                        <a [href]="'https://localhost:44367/' + attr.filePath" 
                            [download]="attr.fileName"
                            target="_blank"
                            class="p-2 bg-white rounded-full text-text-primary hover:bg-primary hover:text-white transition-colors shadow-sm"

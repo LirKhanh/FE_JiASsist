@@ -7,5 +7,18 @@
     "pathRewrite": {
       "^/api": "/api"
     }
+  },
+  "/uploads": {
+    "target": "https://localhost:44367",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/issueHub": {
+    "target": "https://localhost:44367",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }
