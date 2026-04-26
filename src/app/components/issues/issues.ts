@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IssueService } from '../../services/issue.service';
@@ -6,16 +6,21 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ProjectsService } from '../../services/projects.service';
 import { BaseService } from '../../services/base.service';
 import { NotificationService } from '../../services/notification.service';
-import { switchMap, of } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { RichTextEditorComponent } from '../shared/rich-text-editor/rich-text-editor';
+import { IssueHubService } from '../../services/issue-hub.service';
+import { switchMap, of, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-issues',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RichTextEditorComponent],
   templateUrl: './issues.html',
   styleUrl: './issues.css'
 })
-export class IssuesComponent implements OnInit {
+export class IssuesComponent implements OnInit, OnDestroy {
+  @ViewChild('commentEditor') commentEditor!: RichTextEditorComponent;
+  
   issues: any[] = [];
   selectedIssue: any | null = null;
   comments: any[] = [];
@@ -34,14 +39,23 @@ export class IssuesComponent implements OnInit {
   allProjectIssues: any[] = [];
   newIssue: any = {};
 
+  // Editor states
+  isEditingDescription = false;
+  editingCommentId: number | null = null;
+  
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private issueService: IssueService,
     private projectsService: ProjectsService,
     private baseService: BaseService,
     private notificationService: NotificationService,
+    private authService: AuthService,
+    private hubService: IssueHubService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state) {
@@ -54,16 +68,10 @@ export class IssuesComponent implements OnInit {
     }
   }
 
-  get filteredIssues() {
-    if (!this.searchTerm) return this.issues;
-    const term = this.searchTerm.toLowerCase();
-    return this.issues.filter(issue => 
-      (issue.issueName || issue.issue_name || issue.summary || '').toLowerCase().includes(term) ||
-      (issue.issueId || issue.issue_id || issue.key || '').toLowerCase().includes(term)
-    );
-  }
-
   ngOnInit() {
+    this.hubService.startConnection();
+    this.setupHubListeners();
+
     if (this.issues.length === 0) {
       this.loadDataFromParams();
     } else {
@@ -73,6 +81,74 @@ export class IssuesComponent implements OnInit {
       }
       this.cdr.detectChanges();
     }
+  }
+
+  ngOnDestroy() {
+    this.hubService.stopConnection();
+    this.subscriptions.unsubscribe();
+  }
+
+  setupHubListeners() {
+    this.subscriptions.add(
+      this.hubService.issueUpdated$.subscribe(data => {
+        this.zone.run(() => {
+          if (this.selectedIssue && (this.selectedIssue.issueId === data.issueId || this.selectedIssue.issueId === data.issue_id)) {
+            if (data.description !== undefined) {
+              this.selectedIssue.description = data.description;
+            }
+            if (data.attachments) {
+              this.attachments = data.attachments;
+            }
+            if (data.issueName) {
+              Object.assign(this.selectedIssue, data);
+            }
+            this.cdr.detectChanges();
+          }
+          
+          const idx = this.issues.findIndex(i => (i.issueId || i.issue_id) === (data.issueId || data.issue_id));
+          if (idx !== -1) {
+            Object.assign(this.issues[idx], data);
+            this.cdr.detectChanges();
+          }
+        });
+      })
+    );
+
+    this.subscriptions.add(
+      this.hubService.commentAdded$.subscribe(data => {
+        this.zone.run(() => {
+          if (this.selectedIssue && this.selectedIssue.issueId === data.issueId) {
+            this.projectsService.getIssueDetail(data.issueId).subscribe(res => {
+              if (res.success && res.data) {
+                this.comments = res.data.comments || [];
+                this.cdr.detectChanges();
+              }
+            });
+          }
+        });
+      })
+    );
+
+    this.subscriptions.add(
+      this.hubService.commentUpdated$.subscribe(data => {
+        this.zone.run(() => {
+          const comment = this.comments.find(c => c.issueCommentId === data.commentId);
+          if (comment) {
+            comment.content = data.content;
+            this.cdr.detectChanges();
+          }
+        });
+      })
+    );
+  }
+
+  get filteredIssues() {
+    if (!this.searchTerm) return this.issues;
+    const term = this.searchTerm.toLowerCase();
+    return this.issues.filter(issue => 
+      (issue.issueName || issue.issue_name || issue.summary || '').toLowerCase().includes(term) ||
+      (issue.issueId || issue.issue_id || issue.key || '').toLowerCase().includes(term)
+    );
   }
 
   loadDataFromParams() {
@@ -154,17 +230,28 @@ export class IssuesComponent implements OnInit {
     if (!issue) return;
     const issueId = issue.issueId || issue.issue_id || issue.id;
     
-    // Check if we already have this issue's full detail to avoid re-fetching 
-    // (Only fetch if comments/history are missing or ID changed)
     if (this.selectedIssue && (this.selectedIssue.issueId === issueId) && this.comments.length > 0) {
       return;
     }
 
     if (!issueId) return;
 
+    // Reset editor states
+    this.isEditingDescription = false;
+    this.editingCommentId = null;
+    
+    // Clear comment editor content when switching issues
+    if (this.commentEditor) {
+      this.commentEditor.clear();
+    }
+
     this.projectsService.getIssueDetail(issueId).subscribe(res => {
       if (res.success && res.data) {
         this.updateSelectedIssueData(res.data);
+        if (this.project?.projectId) {
+          this.hubService.joinProject(this.project.projectId);
+        }
+        this.hubService.joinIssue(issueId);
       } else {
         this.selectedIssue = issue;
         this.comments = [];
@@ -172,6 +259,81 @@ export class IssuesComponent implements OnInit {
         this.histories = [];
       }
       this.cdr.detectChanges();
+    });
+  }
+
+  // Rich Text Editor Actions
+
+  saveDescription(event: { html: string, files: File[] }) {
+    if (!this.selectedIssue) return;
+
+    const userId = this.authService.getUser()?.userId || '';
+    const formData = new FormData();
+    formData.append('description', event.html);
+    formData.append('userId', userId);
+    event.files.forEach(file => {
+      formData.append('files', file);
+    });
+
+    this.issueService.updateDescription(this.selectedIssue.issueId, formData).subscribe(res => {
+      if (res.success) {
+        this.notificationService.success('Description updated');
+        this.isEditingDescription = false;
+        if (res.data.description) this.selectedIssue.description = res.data.description;
+        if (res.data.attachments) this.attachments = res.data.attachments;
+        this.cdr.detectChanges();
+      } else {
+        this.notificationService.error('Failed to update description');
+      }
+    });
+  }
+
+  addComment(event: { html: string, files: File[] }) {
+    if (!this.selectedIssue) return;
+
+    const userId = this.authService.getUser()?.userId || '';
+    const formData = new FormData();
+    formData.append('content', event.html);
+    formData.append('userId', userId);
+    event.files.forEach(file => {
+      formData.append('files', file);
+    });
+
+    this.issueService.addComment(this.selectedIssue.issueId, formData).subscribe(res => {
+      if (res.success) {
+        this.notificationService.success('Comment added');
+        if (this.commentEditor) this.commentEditor.clear();
+        // SignalR will update the list, but we can also re-fetch for safety
+        this.projectsService.getIssueDetail(this.selectedIssue.issueId).subscribe(res => {
+          if (res.success && res.data) {
+            this.comments = res.data.comments || [];
+            this.attachments = res.data.attachments || [];
+            this.cdr.detectChanges();
+          }
+        });
+      } else {
+        this.notificationService.error('Failed to add comment');
+      }
+    });
+  }
+
+  startEditComment(comment: any) {
+    this.editingCommentId = comment.issueCommentId;
+    this.cdr.detectChanges();
+  }
+
+  saveEditedComment(commentId: number, event: { html: string, files: File[] }) {
+    const userId = this.authService.getUser()?.userId || '';
+    this.issueService.updateComment(commentId, event.html, userId).subscribe(res => {
+      // Backend returns void or Ok, we just need to know it's success
+      this.notificationService.success('Comment updated');
+      this.editingCommentId = null;
+      // Content will be updated via SignalR or we can update locally
+      const comment = this.comments.find(c => c.issueCommentId === commentId);
+      if (comment) comment.content = event.html;
+      this.cdr.detectChanges();
+    }, err => {
+      this.notificationService.error('Failed to update comment');
     });
   }
 
@@ -330,6 +492,12 @@ export class IssuesComponent implements OnInit {
 
   closeCreateModal() {
     this.isCreateModalOpen = false;
+  }
+
+  isImage(fileName: string): boolean {
+    if (!fileName) return false;
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '');
   }
 
   saveNewIssue() {

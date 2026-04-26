@@ -16,6 +16,7 @@
   max-width: 480px;
   display: flex;
   align-items: center;
+  pointer-events: none; /* Let clicks pass through to header below if overlapping */
 }
 
 .search-wrapper {
@@ -23,6 +24,7 @@
   width: 100%;
   display: flex;
   align-items: center;
+  pointer-events: auto; /* Re-enable clicks for the input itself */
 }
 
 .search-input {

@@ -178,7 +178,22 @@ textarea {
   transition: border-color 0.2s;
 }
 
-input:focus {
-  border-color: var(--primary-color);
-  outline: none;
+/* Rich Text Styles */
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.prose b, .prose strong {
+  font-weight: bold;
+}
+.prose i, .prose em {
+  font-style: italic;
 }

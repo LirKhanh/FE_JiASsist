@@ -65,6 +65,8 @@ export class IssueService {
   }
 
   updateComment(commentId: number, content: string, userId: string): Observable<ApiResponse<any>> {
-    return this.http.put<ApiResponse<any>>(`/api/issues/comment/${commentId}?userId=${userId}`, content);
+    return this.http.put<ApiResponse<any>>(`/api/issues/comment/${commentId}?userId=${userId}`, JSON.stringify(content), {
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
