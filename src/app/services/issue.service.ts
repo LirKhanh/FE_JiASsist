@@ -56,6 +56,10 @@ export class IssueService {
     return this.http.post<ApiResponse<any>>('/api/issues', issue);
   }
 
+  updateIssue(issueId: string, issue: any): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`/api/issues/${issueId}`, issue);
+  }
+
   updateDescription(issueId: string, formData: FormData): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(`/api/issues/${issueId}/description`, formData);
   }

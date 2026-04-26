@@ -31,6 +31,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
   project: any = null;
   searchTerm: string = '';
   isCreateModalOpen = false;
+  isEditMode = false;
   issueTypes: any[] = [];
   issuePriorities: any[] = [];
   users: any[] = [];
@@ -87,7 +88,12 @@ export class IssuesComponent implements OnInit, OnDestroy {
     this.hubService.stopConnection();
     this.subscriptions.unsubscribe();
   }
-
+scrollToComment() {
+  const el = document.getElementById('commentSection');
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' }); // mượt
+  }
+}
   setupHubListeners() {
     this.subscriptions.add(
       this.hubService.issueUpdated$.subscribe(data => {
@@ -192,16 +198,20 @@ export class IssuesComponent implements OnInit, OnDestroy {
       })
     ).subscribe({
       next: (res: any) => {
-        if (res.success && res.data) {
-          this.updateSelectedIssueData(res.data);
-        }
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.zone.run(() => {
+          if (res.success && res.data) {
+            this.updateSelectedIssueData(res.data);
+          }
+          this.loading = false;
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
-        console.error('Error loading issue data:', err);
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.zone.run(() => {
+          console.error('Error loading issue data:', err);
+          this.loading = false;
+          this.cdr.detectChanges();
+        });
       }
     });
   }
@@ -215,22 +225,25 @@ export class IssuesComponent implements OnInit, OnDestroy {
 
   loadDefaultIssues() {
     this.issueService.getIssues().subscribe(response => {
-      if (response.success && response.data) {
-        this.issues = response.data;
-        if (this.issues.length > 0) {
-          this.selectIssue(this.issues[0]);
+      this.zone.run(() => {
+        if (response.success && response.data) {
+          this.issues = response.data;
+          if (this.issues.length > 0) {
+            this.selectIssue(this.issues[0]);
+          }
         }
-      }
-      this.loading = false;
-      this.cdr.detectChanges();
+        this.loading = false;
+        this.cdr.detectChanges();
+      });
     });
   }
 
   selectIssue(issue: any) {
     if (!issue) return;
     const issueId = issue.issueId || issue.issue_id || issue.id;
+    const currentSelectedId = this.selectedIssue?.issueId || this.selectedIssue?.issue_id || this.selectedIssue?.id;
     
-    if (this.selectedIssue && (this.selectedIssue.issueId === issueId) && this.comments.length > 0) {
+    if (this.selectedIssue && (currentSelectedId === issueId) && this.comments.length > 0) {
       return;
     }
 
@@ -246,19 +259,21 @@ export class IssuesComponent implements OnInit, OnDestroy {
     }
 
     this.projectsService.getIssueDetail(issueId).subscribe(res => {
-      if (res.success && res.data) {
-        this.updateSelectedIssueData(res.data);
-        if (this.project?.projectId) {
-          this.hubService.joinProject(this.project.projectId);
+      this.zone.run(() => {
+        if (res.success && res.data) {
+          this.updateSelectedIssueData(res.data);
+          if (this.project?.projectId) {
+            this.hubService.joinProject(this.project.projectId);
+          }
+          this.hubService.joinIssue(issueId);
+        } else {
+          this.selectedIssue = issue;
+          this.comments = [];
+          this.attachments = [];
+          this.histories = [];
         }
-        this.hubService.joinIssue(issueId);
-      } else {
-        this.selectedIssue = issue;
-        this.comments = [];
-        this.attachments = [];
-        this.histories = [];
-      }
-      this.cdr.detectChanges();
+        this.cdr.detectChanges();
+      });
     });
   }
 
@@ -276,15 +291,17 @@ export class IssuesComponent implements OnInit, OnDestroy {
     });
 
     this.issueService.updateDescription(this.selectedIssue.issueId, formData).subscribe(res => {
-      if (res.success) {
-        this.notificationService.success('Description updated');
-        this.isEditingDescription = false;
-        if (res.data.description) this.selectedIssue.description = res.data.description;
-        if (res.data.attachments) this.attachments = res.data.attachments;
-        this.cdr.detectChanges();
-      } else {
-        this.notificationService.error('Failed to update description');
-      }
+      this.zone.run(() => {
+        if (res.success) {
+          this.notificationService.success('Description updated');
+          this.isEditingDescription = false;
+          if (res.data.description) this.selectedIssue.description = res.data.description;
+          if (res.data.attachments) this.attachments = res.data.attachments;
+          this.cdr.detectChanges();
+        } else {
+          this.notificationService.error('Failed to update description');
+        }
+      });
     });
   }
 
@@ -300,20 +317,24 @@ export class IssuesComponent implements OnInit, OnDestroy {
     });
 
     this.issueService.addComment(this.selectedIssue.issueId, formData).subscribe(res => {
-      if (res.success) {
-        this.notificationService.success('Comment added');
-        if (this.commentEditor) this.commentEditor.clear();
-        // SignalR will update the list, but we can also re-fetch for safety
-        this.projectsService.getIssueDetail(this.selectedIssue.issueId).subscribe(res => {
-          if (res.success && res.data) {
-            this.comments = res.data.comments || [];
-            this.attachments = res.data.attachments || [];
-            this.cdr.detectChanges();
-          }
-        });
-      } else {
-        this.notificationService.error('Failed to add comment');
-      }
+      this.zone.run(() => {
+        if (res.success) {
+          this.notificationService.success('Comment added');
+          if (this.commentEditor) this.commentEditor.clear();
+          // SignalR will update the list, but we can also re-fetch for safety
+          this.projectsService.getIssueDetail(this.selectedIssue.issueId).subscribe(res => {
+            this.zone.run(() => {
+              if (res.success && res.data) {
+                this.comments = res.data.comments || [];
+                this.attachments = res.data.attachments || [];
+                this.cdr.detectChanges();
+              }
+            });
+          });
+        } else {
+          this.notificationService.error('Failed to add comment');
+        }
+      });
     });
   }
 
@@ -325,15 +346,19 @@ export class IssuesComponent implements OnInit, OnDestroy {
   saveEditedComment(commentId: number, event: { html: string, files: File[] }) {
     const userId = this.authService.getUser()?.userId || '';
     this.issueService.updateComment(commentId, event.html, userId).subscribe(res => {
-      // Backend returns void or Ok, we just need to know it's success
-      this.notificationService.success('Comment updated');
-      this.editingCommentId = null;
-      // Content will be updated via SignalR or we can update locally
-      const comment = this.comments.find(c => c.issueCommentId === commentId);
-      if (comment) comment.content = event.html;
-      this.cdr.detectChanges();
+      this.zone.run(() => {
+        // Backend returns void or Ok, we just need to know it's success
+        this.notificationService.success('Comment updated');
+        this.editingCommentId = null;
+        // Content will be updated via SignalR or we can update locally
+        const comment = this.comments.find(c => c.issueCommentId === commentId);
+        if (comment) comment.content = event.html;
+        this.cdr.detectChanges();
+      });
     }, err => {
-      this.notificationService.error('Failed to update comment');
+      this.zone.run(() => {
+        this.notificationService.error('Failed to update comment');
+      });
     });
   }
 
@@ -409,13 +434,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
     return 'text-gray-500';
   }
 
-  openCreateModal() {
-    const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId');
-    if (!projectId) {
-      this.notificationService.warning('Please select a project first');
-      return;
-    }
-
+  private loadModalData(projectId: string) {
     // Load from localStorage
     try {
       this.issueTypes = JSON.parse(localStorage.getItem('issueTypes') || '[]');
@@ -435,59 +454,111 @@ export class IssuesComponent implements OnInit, OnDestroy {
       ],
       keys: ["users", "sprints", "epics", "issues"]
     }).subscribe(res => {
-      if (res.success && res.data) {
-        this.users = res.data.users || [];
-        this.sprints = res.data.sprints || [];
-        this.epics = res.data.epics || [];
-        this.allProjectIssues = res.data.issues || [];
-        this.cdr.detectChanges();
-      }
+      this.zone.run(() => {
+        if (res.success && res.data) {
+          this.users = res.data.users || [];
+          this.sprints = res.data.sprints || [];
+          this.epics = res.data.epics || [];
+          this.allProjectIssues = res.data.issues || [];
+          this.cdr.detectChanges();
+        }
+      });
     });
+  }
+
+  openCreateModal() {
+    const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId') || (this.issues.length > 0 ? (this.issues[0].projectId || this.issues[0].project_id) : null);
+    if (!projectId) {
+      this.notificationService.warning('Please select a project first');
+      return;
+    }
+
+    this.isEditMode = false;
+    this.loadModalData(projectId);
 
     this.projectsService.getNewIssueId(projectId).subscribe(res => {
-      if (res.success && res.data) {
-        const nowISO = new Date().toISOString();
-        const nowFormatted = new Date().toISOString().slice(0, 16); // For datetime-local input
+      this.zone.run(() => {
+        if (res.success && res.data) {
+          const nowFormatted = new Date().toISOString().slice(0, 16); // For datetime-local input
 
-        this.newIssue = {
-          issueId: res.data,
-          projectId: projectId,
-          issueName: '',
-          issueStatus: 'OPEN',
-          issueType: this.issueTypes.length > 0 ? (this.issueTypes[0].issueTypeId || this.issueTypes[0]) : 'TASK',
-          issuePriorityId: this.issuePriorities.length > 0 ? (this.issuePriorities[0].issuePriorityId || this.issuePriorities[0]) : 'MEDIUM',
-          description: '',
-          issueAttachmentId: '',
-          listIssues: '',
-          sprintId: '',
-          epicId: '',
-          issueDevRate: 0,
-          estimateDev: 0,
-          estimateReopenDev: 0,
-          issueTestRate: 0,
-          estimateTest: 0,
-          estimateReopenTest: 0,
-          reporterId: localStorage.getItem('userId') || '',
-          assigneeId: '',
-          developerId: '',
-          testerId: '',
-          baId: '',
-          cusRequestDate: nowFormatted,
-          pmRequestDate: nowFormatted,
-          deadlineDev: nowFormatted,
-          deadlineTest: nowFormatted,
-          status: true,
-          createdAt: new Date(),
-          createdBy: localStorage.getItem('userId') || '',
-          updateAt: new Date(),
-          updateBy: localStorage.getItem('userId') || ''
-        };
-        this.isCreateModalOpen = true;
-        this.cdr.detectChanges();
-      } else {
-        this.notificationService.error('Failed to get new Issue ID');
-      }
+          this.newIssue = {
+            issueId: res.data,
+            projectId: projectId,
+            issueName: '',
+            issueStatus: 'OPEN',
+            issueType: this.issueTypes.length > 0 ? (this.issueTypes[0].issueTypeId || this.issueTypes[0]) : 'TASK',
+            issuePriorityId: this.issuePriorities.length > 0 ? (this.issuePriorities[0].issuePriorityId || this.issuePriorities[0]) : 'MEDIUM',
+            description: '',
+            issueAttachmentId: '',
+            listIssues: '',
+            sprintId: '',
+            epicId: '',
+            issueDevRate: 0,
+            estimateDev: 0,
+            estimateReopenDev: 0,
+            issueTestRate: 0,
+            estimateTest: 0,
+            estimateReopenTest: 0,
+            reporterId: localStorage.getItem('userId') || '',
+            assigneeId: '',
+            developerId: '',
+            testerId: '',
+            baId: '',
+            cusRequestDate: nowFormatted,
+            pmRequestDate: nowFormatted,
+            deadlineDev: nowFormatted,
+            deadlineTest: nowFormatted,
+            status: true,
+            createdAt: new Date(),
+            createdBy: localStorage.getItem('userId') || '',
+            updateAt: new Date(),
+            updateBy: localStorage.getItem('userId') || ''
+          };
+          this.isCreateModalOpen = true;
+          this.cdr.detectChanges();
+        } else {
+          this.notificationService.error('Failed to get new Issue ID');
+        }
+      });
     });
+  }
+
+  openEditModal(issue: any) {
+    if (!issue) return;
+    const projectId = this.project?.projectId || issue.projectId || issue.project_id;
+    if (!projectId) return;
+
+    this.isEditMode = true;
+    this.loadModalData(projectId);
+
+    // Map existing issue to newIssue object
+    this.newIssue = {
+      ...issue,
+      cusRequestDate: this.formatDateForInput(issue.cusRequestDate),
+      pmRequestDate: this.formatDateForInput(issue.pmRequestDate),
+      deadlineDev: this.formatDateForInput(issue.deadlineDev),
+      deadlineTest: this.formatDateForInput(issue.deadlineTest),
+      updateAt: new Date(),
+      updateBy: localStorage.getItem('userId') || ''
+    };
+
+    this.isCreateModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  private formatDateForInput(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    
+    // Adjusted for local timezone
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
   closeCreateModal() {
@@ -506,14 +577,20 @@ export class IssuesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.issueService.saveIssue(this.newIssue).subscribe(res => {
-      if (res.success) {
-        this.notificationService.success('Issue created successfully');
-        this.isCreateModalOpen = false;
-        this.loadDataFromParams(); // Refresh the list
-      } else {
-        this.notificationService.error('Error saving issue: ' + res.message);
-      }
+    const request = this.isEditMode 
+      ? this.issueService.updateIssue(this.newIssue.issueId, this.newIssue)
+      : this.issueService.saveIssue(this.newIssue);
+
+    request.subscribe(res => {
+      this.zone.run(() => {
+        if (res.success) {
+          this.notificationService.success(this.isEditMode ? 'Issue updated successfully' : 'Issue created successfully');
+          this.isCreateModalOpen = false;
+          this.loadDataFromParams(); // Refresh the list
+        } else {
+          this.notificationService.error('Error saving issue: ' + res.message);
+        }
+      });
     });
   }
 }
