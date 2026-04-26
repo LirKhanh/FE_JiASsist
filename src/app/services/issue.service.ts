@@ -55,4 +55,16 @@ export class IssueService {
   saveIssue(issue: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>('/api/issues', issue);
   }
+
+  updateDescription(issueId: string, formData: FormData): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`/api/issues/${issueId}/description`, formData);
+  }
+
+  addComment(issueId: string, formData: FormData): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`/api/issues/${issueId}/comment`, formData);
+  }
+
+  updateComment(commentId: number, content: string, userId: string): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`/api/issues/comment/${commentId}?userId=${userId}`, content);
+  }
 }

@@ -43,4 +43,8 @@ export class ProjectsService {
   getNewIssueId(projectId: string): Observable<ApiResponse<string>> {
     return this.http.get<ApiResponse<string>>(`/api/issues/newIssue?projectId=${projectId}`);
   }
+
+  updateIssue(issueId: string, formData: FormData): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`/api/issues/${issueId}`, formData);
+  }
 }
