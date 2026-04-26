@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IssueService } from '../../services/issue.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProjectsService } from '../../services/projects.service';
+import { BaseService } from '../../services/base.service';
+import { NotificationService } from '../../services/notification.service';
 import { switchMap, of } from 'rxjs';
 
 @Component({
@@ -23,10 +25,20 @@ export class IssuesComponent implements OnInit {
   loading = true;
   project: any = null;
   searchTerm: string = '';
+  isCreateModalOpen = false;
+  issueTypes: any[] = [];
+  issuePriorities: any[] = [];
+  users: any[] = [];
+  sprints: any[] = [];
+  epics: any[] = [];
+  allProjectIssues: any[] = [];
+  newIssue: any = {};
 
   constructor(
     private issueService: IssueService,
     private projectsService: ProjectsService,
+    private baseService: BaseService,
+    private notificationService: NotificationService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
@@ -233,5 +245,107 @@ export class IssuesComponent implements OnInit {
     if (p.includes('medium') || p.includes('p2')) return 'text-orange-500';
     if (p.includes('low') || p.includes('p3')) return 'text-blue-500';
     return 'text-gray-500';
+  }
+
+  openCreateModal() {
+    const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId');
+    if (!projectId) {
+      this.notificationService.warning('Please select a project first');
+      return;
+    }
+
+    // Load from localStorage
+    try {
+      this.issueTypes = JSON.parse(localStorage.getItem('issueTypes') || '[]');
+      this.issuePriorities = JSON.parse(localStorage.getItem('issuePriorities') || '[]');
+    } catch (e) {
+      this.issueTypes = [];
+      this.issuePriorities = [];
+    }
+
+    // Load combobox data
+    this.baseService.loadComboboxData({
+      queries: [
+        "select user_id, username, fullname from users where status is true",
+        "select sprint_id, sprint_name from sprints where project_id = '" + projectId + "'",
+        "select issue_id, issue_name from issues where issue_type = 'EPIC' and project_id = '" + projectId + "'",
+        "select issue_id, issue_name from issues where project_id = '" + projectId + "'"
+      ],
+      keys: ["users", "sprints", "epics", "issues"]
+    }).subscribe(res => {
+      if (res.success && res.data) {
+        this.users = res.data.users || [];
+        this.sprints = res.data.sprints || [];
+        this.epics = res.data.epics || [];
+        this.allProjectIssues = res.data.issues || [];
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.projectsService.getNewIssueId(projectId).subscribe(res => {
+      if (res.success && res.data) {
+        const nowISO = new Date().toISOString();
+        const nowFormatted = new Date().toISOString().slice(0, 16); // For datetime-local input
+
+        this.newIssue = {
+          issueId: res.data,
+          projectId: projectId,
+          issueName: '',
+          issueStatus: 'OPEN',
+          issueType: this.issueTypes.length > 0 ? (this.issueTypes[0].issueTypeId || this.issueTypes[0]) : 'TASK',
+          issuePriorityId: this.issuePriorities.length > 0 ? (this.issuePriorities[0].issuePriorityId || this.issuePriorities[0]) : 'MEDIUM',
+          description: '',
+          issueAttachmentId: '',
+          listIssues: '',
+          sprintId: '',
+          epicId: '',
+          issueDevRate: 0,
+          estimateDev: 0,
+          estimateReopenDev: 0,
+          issueTestRate: 0,
+          estimateTest: 0,
+          estimateReopenTest: 0,
+          reporterId: localStorage.getItem('userId') || '',
+          assigneeId: '',
+          developerId: '',
+          testerId: '',
+          baId: '',
+          cusRequestDate: nowFormatted,
+          pmRequestDate: nowFormatted,
+          deadlineDev: nowFormatted,
+          deadlineTest: nowFormatted,
+          status: true,
+          createdAt: new Date(),
+          createdBy: localStorage.getItem('userId') || '',
+          updateAt: new Date(),
+          updateBy: localStorage.getItem('userId') || ''
+        };
+        this.isCreateModalOpen = true;
+        this.cdr.detectChanges();
+      } else {
+        this.notificationService.error('Failed to get new Issue ID');
+      }
+    });
+  }
+
+  closeCreateModal() {
+    this.isCreateModalOpen = false;
+  }
+
+  saveNewIssue() {
+    if (!this.newIssue.issueName) {
+      this.notificationService.warning('Issue Name is required');
+      return;
+    }
+
+    this.issueService.saveIssue(this.newIssue).subscribe(res => {
+      if (res.success) {
+        this.notificationService.success('Issue created successfully');
+        this.isCreateModalOpen = false;
+        this.loadDataFromParams(); // Refresh the list
+      } else {
+        this.notificationService.error('Error saving issue: ' + res.message);
+      }
+    });
   }
 }

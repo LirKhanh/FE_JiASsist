@@ -116,4 +116,8 @@ export class ProjectsComponent implements OnInit {
       }
     });
   }
+
+  viewProjectStatistics(projectId: string): void {
+    this.router.navigate([`/projects/${projectId}/statistics`]);
+  }
 }

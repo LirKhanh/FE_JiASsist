@@ -1,0 +1,73 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8 flex justify-between items-center">
+    <div class="flex items-center">
+      <button (click)="goBack()" class="mr-4 p-2 hover:bg-gray-100 rounded-full transition-colors text-text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </button>
+      <div>
+        <nav class="flex text-xs text-text-secondary mb-1 space-x-2 uppercase font-bold tracking-wider">
+          <span class="hover:underline cursor-pointer" (click)="goBack()">Projects</span>
+          <span>/</span>
+          <span class="text-primary">{{ project?.projectName }}</span>
+        </nav>
+        <h1 class="text-2xl font-bold text-text-primary">Project Statistics</h1>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+
+  <div *ngIf="!isLoading" class="space-y-8 animate-in fade-in duration-500">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-border">
+        <p class="text-[10px] font-bold text-text-secondary uppercase mb-1">Total Issues</p>
+        <p class="text-3xl font-bold text-text-primary">{{ issues.length }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-border">
+        <p class="text-[10px] font-bold text-text-secondary uppercase mb-1">Completion Rate</p>
+        <p class="text-3xl font-bold text-emerald-600">
+          {{ issues.length > 0 ? (issues | filterStatus:'DONE').length / issues.length * 100 : 0 | number:'1.0-0' }}%
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Chart 1: Status Distribution -->
+      <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
+        <h3 class="text-sm font-bold text-text-primary mb-6">Status Distribution</h3>
+        <div class="aspect-square max-h-[300px] mx-auto">
+          <canvas #statusChart></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: Priority Distribution -->
+      <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
+        <h3 class="text-sm font-bold text-text-primary mb-6">Issues by Priority</h3>
+        <div class="aspect-square max-h-[300px] mx-auto">
+          <canvas #priorityChart></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 3: Type Distribution -->
+      <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
+        <h3 class="text-sm font-bold text-text-primary mb-6">Type Distribution</h3>
+        <div class="aspect-square max-h-[300px] mx-auto">
+          <canvas #typeChart></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 4: Time Estimation -->
+      <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
+        <h3 class="text-sm font-bold text-text-primary mb-6">Time Estimation (Hours)</h3>
+        <div class="aspect-video max-h-[300px] mx-auto">
+          <canvas #timeChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -55,7 +55,7 @@
     </div>
     <div class="flex-grow"></div>
     <div class="flex items-center space-x-3">
-        <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all">
+        <button (click)="openCreateModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all">
           Create Issue
         </button>
     </div>
@@ -201,6 +201,19 @@
                   <span class="text-sm font-medium text-text-primary">{{ selectedIssue.projectId }}</span>
                 </div>
               }
+            </div>
+          </div>
+
+          <!-- Description Section -->
+          <div class="mb-10">
+            <h3 class="text-sm font-bold text-text-primary mb-4">Description</h3>
+            <div class="border border-border rounded-lg p-4 bg-gray-50/30 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all shadow-sm">
+              <textarea 
+                [(ngModel)]="selectedIssue.description" 
+                placeholder="Add a description to provide context and details for this issue..." 
+                rows="6" 
+                class="w-full bg-transparent outline-none text-sm resize-none leading-relaxed text-text-primary"
+              ></textarea>
             </div>
           </div>
 
@@ -447,4 +460,247 @@
       }
     </div>
   </div>
+
+  <!-- Create Issue Modal -->
+  @if (isCreateModalOpen) {
+    <div class="fixed inset-0 z-[100] overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true" (click)="closeCreateModal()">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-border">
+          <div class="bg-white px-8 pt-6 pb-8">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-bold text-text-primary">Create Issue</h3>
+              <button (click)="closeCreateModal()" class="text-text-secondary hover:text-text-primary transition-colors">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Issue ID (Read-only) -->
+              <div>
+                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Issue ID (System Generated)</label>
+                <input type="text" [value]="newIssue.issueId" readonly
+                       class="w-full bg-gray-50 border border-border rounded-lg px-4 py-2.5 text-sm font-bold text-primary cursor-not-allowed">
+              </div>
+
+              <!-- Summary/Name -->
+              <div>
+                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Summary <span class="text-red-500">*</span></label>
+                <input type="text" [(ngModel)]="newIssue.issueName" placeholder="What needs to be done?"
+                       class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+              </div>
+
+              <!-- Issue Type & Priority -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Issue Type</label>
+                  <select [(ngModel)]="newIssue.issueType"
+                          class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                    @for (type of issueTypes; track (type.issueTypeId || type)) {
+                      <option [value]="type.issueTypeId || type">{{ type.issueTypeName || type }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Priority</label>
+                  <select [(ngModel)]="newIssue.issuePriorityId"
+                          class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                    @for (priority of issuePriorities; track (priority.issuePriorityId || priority)) {
+                      <option [value]="priority.issuePriorityId || priority">{{ priority.issuePriorityName || priority }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div>
+                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Description</label>
+                <textarea [(ngModel)]="newIssue.description" rows="3" 
+                          placeholder="Provide more context and details..."
+                          class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"></textarea>
+              </div>
+
+              <!-- People Section -->
+              <div class="border-t border-border pt-6">
+                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  People
+                </h4>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Assignee</label>
+                    <select [(ngModel)]="newIssue.assigneeId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">Unassigned</option>
+                      @for (user of users; track user.user_id) {
+                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Developer</label>
+                    <select [(ngModel)]="newIssue.developerId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">Unassigned</option>
+                      @for (user of users; track user.user_id) {
+                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Tester</label>
+                    <select [(ngModel)]="newIssue.testerId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">Unassigned</option>
+                      @for (user of users; track user.user_id) {
+                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Business Analyst</label>
+                    <select [(ngModel)]="newIssue.baId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">Unassigned</option>
+                      @for (user of users; track user.user_id) {
+                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Planning Section -->
+              <div class="border-t border-border pt-6">
+                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Planning
+                </h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Sprint</label>
+                    <select [(ngModel)]="newIssue.sprintId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">None</option>
+                      @for (sprint of sprints; track sprint.sprint_id) {
+                        <option [value]="sprint.sprint_id">{{ sprint.sprint_name }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Epic</label>
+                    <select [(ngModel)]="newIssue.epicId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">None</option>
+                      @for (epic of epics; track epic.issue_id) {
+                        <option [value]="epic.issue_id">{{ epic.issue_name }} ({{ epic.issue_id }})</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Linked Issue</label>
+                    <select [(ngModel)]="newIssue.listIssues" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">Not linked</option>
+                      @for (issue of allProjectIssues; track issue.issue_id) {
+                        <option [value]="issue.issue_id">{{ issue.issue_id }} - {{ issue.issue_name }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rates & Estimates -->
+              <div class="border-t border-border pt-6">
+                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Rates & Estimates
+                </h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Dev Rate (%)</label>
+                    <input type="number" [(ngModel)]="newIssue.issueDevRate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Est. Dev (h)</label>
+                    <input type="number" [(ngModel)]="newIssue.estimateDev" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Reopen Dev (h)</label>
+                    <input type="number" [(ngModel)]="newIssue.estimateReopenDev" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Test Rate (%)</label>
+                    <input type="number" [(ngModel)]="newIssue.issueTestRate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Est. Test (h)</label>
+                    <input type="number" [(ngModel)]="newIssue.estimateTest" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Reopen Test (h)</label>
+                    <input type="number" [(ngModel)]="newIssue.estimateReopenTest" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dates Section -->
+              <div class="border-t border-border pt-6">
+                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Dates
+                </h4>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Customer Request</label>
+                    <input type="datetime-local" [(ngModel)]="newIssue.cusRequestDate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">PM Request</label>
+                    <input type="datetime-local" [(ngModel)]="newIssue.pmRequestDate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Deadline Dev</label>
+                    <input type="datetime-local" [(ngModel)]="newIssue.deadlineDev" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Deadline Test</label>
+                    <input type="datetime-local" [(ngModel)]="newIssue.deadlineTest" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Attachments (Simple Input) -->
+              <div class="border-t border-border pt-6">
+                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Attachment ID</label>
+                <input type="text" [(ngModel)]="newIssue.issueAttachmentId" placeholder="Attachment reference..."
+                       class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 px-8 py-4 flex justify-end space-x-3">
+            <button (click)="closeCreateModal()" 
+                    class="px-4 py-2 text-sm font-bold text-text-secondary hover:bg-gray-200 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button (click)="saveNewIssue()" 
+                    [disabled]="!newIssue.issueName"
+                    [class.opacity-50]="!newIssue.issueName"
+                    class="px-6 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-md transition-all">
+              Create
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>

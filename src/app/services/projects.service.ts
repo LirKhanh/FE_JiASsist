@@ -39,4 +39,8 @@ export class ProjectsService {
   getIssueDetail(issueId: string): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`/api/issues/${issueId}`);
   }
+
+  getNewIssueId(projectId: string): Observable<ApiResponse<string>> {
+    return this.http.get<ApiResponse<string>>(`/api/issues/newIssue?projectId=${projectId}`);
+  }
 }
