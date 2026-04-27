@@ -381,39 +381,113 @@ scrollToComment() {
     }
   }
 
-  getStatusConfig(status: string) {
+  // Workflow Logic
+  getCurrentStep(): any {
+    if (!this.selectedIssue) return null;
     const steps = JSON.parse(localStorage.getItem('workflowSteps') || '[]');
-    const step = steps.find((s: any) => s.stepId === status || s.stepName === status);
-    
+    return steps.find((s: any) => s.stepId === this.selectedIssue.issueStatus) || { stepId: this.selectedIssue.issueStatus, stepName: this.selectedIssue.issueStatus };
+  }
+
+  getPreviousStep(): any {
+    const current = this.getCurrentStep();
+    if (!current || !current.preStepId) return null;
+    const steps = JSON.parse(localStorage.getItem('workflowSteps') || '[]');
+    return steps.find((s: any) => s.stepId === current.preStepId);
+  }
+
+  getNextStep(): any {
+    const current = this.getCurrentStep();
+    if (!current || !current.nextStepId) return null;
+    const steps = JSON.parse(localStorage.getItem('workflowSteps') || '[]');
+    return steps.find((s: any) => s.stepId === current.nextStepId);
+  }
+
+  getStepColor(id: string): string {
+    if (!id) return 'bg-gray-400 text-white';
+    const s = id.toUpperCase();
+    if (s.includes('REOPEN')) return 'bg-red-500 text-white';
+    if (s.includes('OPEN')) return 'bg-blue-500 text-white';
+    if (s.includes('INPROGRESS')) return 'bg-yellow-500 text-white';
+    if ((s.includes('INREVIEW') || s.includes('INTESTING'))&&!s.includes('BA')) return 'bg-purple-500 text-white';
+    if (s.includes('BA') ) return 'bg-cyan-500 text-white';
+    if (s.includes('DONE')) return 'bg-green-500 text-white';
+    return 'bg-gray-400 text-white';
+  }
+
+  updateIssueStatus(newStatus: string) {
+    if (!this.selectedIssue || this.selectedIssue.issueStatus === newStatus) return;
+
+    const updatedIssue = { 
+      ...this.selectedIssue, 
+      issueStatus: newStatus,
+      updateAt: new Date(),
+      updateBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId
+    };
+
+    // Use the existing updateIssue API
+    this.issueService.updateIssue(this.selectedIssue.issueId, updatedIssue).subscribe(res => {
+      this.zone.run(() => {
+        if (res.success) {
+          this.notificationService.success(`Status updated to ${newStatus}`);
+          this.selectedIssue.issueStatus = newStatus;
+          this.loadDataFromParams(); // Refresh to sync data
+          this.cdr.detectChanges();
+        } else {
+          this.notificationService.error('Failed to update status: ' + res.message);
+        }
+      });
+    });
+  }
+
+  getStatusConfig(status: string) {
     const s = (status || '').toUpperCase();
-    
-    // Jira Standard Mapping
-    if (s === 'OPEN' || s === 'REOPEN' || s === 'TO DO') {
+    console.log(1);
+    // REOPEN -> Red
+    if (s === 'REOPEN') {
       return { 
-        class: 'bg-gray-100 text-gray-700 border-gray-200', 
-        icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', // Clock icon
-        color: '#42526E' 
+        class: 'bg-red-100 text-red-700 border-red-200', 
+        icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+        color: '#DE350B' 
       };
     }
-    if (s.includes('PROGRESS') || s.includes('TESTING') || s.includes('REVIEW')) {
+    // OPEN / TO DO -> Blue
+    if (s === 'OPEN' || s === 'TO DO') {
       return { 
         class: 'bg-blue-100 text-blue-700 border-blue-200', 
-        icon: 'M13 10V3L4 14h7v7l9-11h-7z', // Bolt icon
+        icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
         color: '#0052CC' 
       };
     }
+    // IN PROGRESS -> Yellow
+    if (s.includes('PROGRESS')) {
+      return { 
+        class: 'bg-amber-100 text-amber-700 border-amber-200', 
+        icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+        color: '#FFAB00' 
+      };
+    }
+    // IN REVIEW / IN TESTING -> Purple
+    if ((s.includes('TESTING') || s.includes('REVIEW'))&&!s.includes('BA')) {
+      return { 
+        class: 'bg-purple-100 text-purple-700 border-purple-200', 
+        icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+        color: '#6554C0' 
+      };
+    }
+     // BA REVIEW / BA TESTING -> Purple
+    if (s.includes('BA')) {
+      return { 
+        class: 'bg-cyan-100 text-cyan-700 border-cyan-200', 
+        icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+        color: '#06b6d4' 
+      };
+    }
+    // DONE / RESOLVED -> Green
     if (s === 'DONE' || s === 'RESOLVED' || s === 'CLOSED') {
       return { 
         class: 'bg-green-100 text-green-700 border-green-200', 
-        icon: 'M5 13l4 4L19 7', // Check icon
+        icon: 'M5 13l4 4L19 7',
         color: '#00875A' 
-      };
-    }
-    if (s === 'STOP') {
-      return { 
-        class: 'bg-red-100 text-red-700 border-red-200', 
-        icon: 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636', // Blocked icon
-        color: '#DE350B' 
       };
     }
 

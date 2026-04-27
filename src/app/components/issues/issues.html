@@ -129,12 +129,43 @@
               Comment
             </button>
             <div class="border-l border-border mx-2"></div>
-            <button class="bg-secondary text-primary hover:bg-blue-100 px-4 py-1.5 rounded text-sm font-bold flex items-center border border-primary/20 transition-colors">
-              {{ selectedIssue.issueStatus }}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+            
+            <!-- Workflow Transition UI -->
+            <div class="flex items-center space-x-3">
+              <!-- Previous Step Button -->
+              @if (getPreviousStep(); as preStep) {
+                <button 
+                  (click)="updateIssueStatus(preStep.stepId)"
+                  class="group flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-text-secondary hover:text-primary hover:border-primary transition-all duration-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span class="text-xs font-bold uppercase tracking-tight">{{ preStep.stepName }}</span>
+                </button>
+              }
+
+              <!-- Current Status Label (Non-clickable) -->
+              <div 
+                [ngClass]="getStepColor(selectedIssue.issueStatus)"
+                class="flex items-center px-4 py-1.5 rounded-full border shadow-sm ring-2 ring-offset-2 ring-primary/10">
+                <span class="text-xs font-black uppercase tracking-widest">{{ getCurrentStep()?.stepName || selectedIssue.issueStatus }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+
+              <!-- Next Step Button -->
+              @if (getNextStep(); as nextStep) {
+                <button 
+                  (click)="updateIssueStatus(nextStep.stepId)"
+                  class="group flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-text-secondary hover:text-primary hover:border-primary transition-all duration-200">
+                  <span class="text-xs font-bold uppercase tracking-tight">{{ nextStep.stepName }}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              }
+            </div>
           </div>
 
           <!-- Additional Info Grid (All non-null fields except People/Dates/Desc) -->
