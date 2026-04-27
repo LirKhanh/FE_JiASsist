@@ -11,6 +11,8 @@ export interface WorkflowStep {
   createdBy: string;
   updateAt: Date;
   updateBy: string;
+  PreStepId?: string; // For edit mode, to keep track of the original step ID
+  NextStepId?: string; // For edit mode, to keep track of the original step ID
   actionType?: string; // A: Add, E: Edit
 }
 

@@ -218,6 +218,9 @@ scrollToComment() {
 
   updateSelectedIssueData(data: any) {
     this.selectedIssue = data.issue;
+    if (this.selectedIssue && !this.selectedIssue.issueId && this.selectedIssue.issue_id) {
+      this.selectedIssue.issueId = this.selectedIssue.issue_id;
+    }
     this.comments = data.comments || [];
     this.attachments = data.attachments || [];
     this.histories = data.histories || [];
@@ -499,7 +502,7 @@ scrollToComment() {
             issueTestRate: 0,
             estimateTest: 0,
             estimateReopenTest: 0,
-            reporterId: localStorage.getItem('userId') || '',
+            reporterId: JSON.parse(localStorage.getItem('user') || '{}')?.userId,
             assigneeId: '',
             developerId: '',
             testerId: '',
@@ -510,9 +513,9 @@ scrollToComment() {
             deadlineTest: nowFormatted,
             status: true,
             createdAt: new Date(),
-            createdBy: localStorage.getItem('userId') || '',
+            createdBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId,
             updateAt: new Date(),
-            updateBy: localStorage.getItem('userId') || ''
+            updateBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId
           };
           this.isCreateModalOpen = true;
           this.cdr.detectChanges();
@@ -534,32 +537,32 @@ scrollToComment() {
     // Map existing issue to newIssue object
     this.newIssue = {
       ...issue,
+      issueId: issue.issueId || issue.issue_id,
+      projectId: projectId,
       cusRequestDate: this.formatDateForInput(issue.cusRequestDate),
       pmRequestDate: this.formatDateForInput(issue.pmRequestDate),
       deadlineDev: this.formatDateForInput(issue.deadlineDev),
       deadlineTest: this.formatDateForInput(issue.deadlineTest),
       updateAt: new Date(),
-      updateBy: localStorage.getItem('userId') || ''
+      updateBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId
     };
 
     this.isCreateModalOpen = true;
     this.cdr.detectChanges();
   }
 
-  private formatDateForInput(date: any): string {
-    if (!date) return '';
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return '';
-    
-    // Adjusted for local timezone
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const hours = String(d.getHours()).padStart(2, '0');
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
+ private formatDateForInput(date: any): string {
+  if (!date) return '';
+
+  const d = new Date(date);
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const hours = String(d.getUTCHours()).padStart(2, '0');
+  const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
 
   closeCreateModal() {
     this.isCreateModalOpen = false;
@@ -577,15 +580,26 @@ scrollToComment() {
       return;
     }
 
+    // Ensure issueId and projectId are present
+    if (this.isEditMode) {
+      this.newIssue.issueId = this.newIssue.issueId || this.newIssue.issue_id;
+    }
+    
+    if (!this.newIssue.projectId) {
+      this.newIssue.projectId = this.project?.projectId || this.newIssue.project_id;
+
+    }
+
     const request = this.isEditMode 
       ? this.issueService.updateIssue(this.newIssue.issueId, this.newIssue)
       : this.issueService.saveIssue(this.newIssue);
-
+    console.log(1);
     request.subscribe(res => {
       this.zone.run(() => {
         if (res.success) {
           this.notificationService.success(this.isEditMode ? 'Issue updated successfully' : 'Issue created successfully');
           this.isCreateModalOpen = false;
+          this.closeCreateModal()
           this.loadDataFromParams(); // Refresh the list
         } else {
           this.notificationService.error('Error saving issue: ' + res.message);

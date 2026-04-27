@@ -115,6 +115,45 @@ import { NotificationService } from '../../../services/notification.service';
                       class="w-full px-4 py-2.5 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium">
                   </div>
 
+                <!-- Pre + Next cùng hàng -->
+                <div class="grid grid-cols-2 gap-3">
+
+                  <!-- Pre Step -->
+                  <div>
+                    <label class="block text-sm font-bold text-text-secondary mb-1 uppercase tracking-wider">
+                      Pre-Step
+                    </label>
+                  <select [(ngModel)]="newStep.PreStepId" (ngModelChange)="updateStepOptions()"
+                        class="w-full px-4 py-2.5 rounded-lg border">
+
+                  <option [ngValue]="null">-- Chọn --</option>
+
+                  <option *ngFor="let step of filteredPreSteps" (ngModelChange)="updateStepOptions()"
+                          [value]="step.stepId">
+                    {{ step.stepName }}
+                  </option>
+
+                </select>
+                  </div>
+
+                  <!-- Next Step -->
+                  <div>
+                    <label class="block text-sm font-bold text-text-secondary mb-1 uppercase tracking-wider">
+                      Next-Step
+                    </label>
+                  <select [(ngModel)]="newStep.NextStepId"
+                        class="w-full px-4 py-2.5 rounded-lg border">
+
+                  <option [ngValue]="null">-- Chọn --</option>
+
+                  <option *ngFor="let step of filteredNextSteps"
+                          [value]="step.stepId">
+                    {{ step.stepName }}
+                  </option>
+
+                </select>
+                  </div>
+                </div>
                   <div class="grid grid-cols-2 gap-4">
                     <!-- Step -->
                     <div>
@@ -163,7 +202,10 @@ export class WorkflowManagementComponent implements OnInit {
   steps: WorkflowStep[] = [];
   isLoading: boolean = true;
   isSaving: boolean = false;
-  
+  workflowSteps: any[] = [];
+
+  filteredPreSteps: any[] = [];
+  filteredNextSteps: any[] = [];
   // Modal state
   isModalOpen: boolean = false;
   isEditMode: boolean = false;
@@ -172,6 +214,8 @@ export class WorkflowManagementComponent implements OnInit {
     stepName: '',
     step: 0,
     status: true,
+    PreStepId: '',
+    NextStepId: '',
     createdAt: new Date(),
     createdBy: '',
     updateAt: new Date(),
@@ -187,6 +231,8 @@ export class WorkflowManagementComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
+    this.workflowSteps = JSON.parse(localStorage.getItem('workflowSteps') || '[]');
+    this.updateStepOptions();
   }
 
   loadData() {
@@ -206,6 +252,18 @@ export class WorkflowManagementComponent implements OnInit {
       }
     });
   }
+ 
+updateStepOptions() {
+  const currentStep = this.newStep.step ?? 0;
+
+  this.filteredPreSteps = this.workflowSteps.filter(x =>
+    x.step <= currentStep && x.stepId !== this.newStep.stepId
+  );
+
+  this.filteredNextSteps = this.workflowSteps.filter(x =>
+    x.step >= currentStep && x.stepId !== this.newStep.stepId
+  );
+}
 
   openModal(preselectedStep?: number) {
     this.isEditMode = false;
@@ -218,7 +276,9 @@ export class WorkflowManagementComponent implements OnInit {
       createdBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId,
       actionType:'A'
     };
+    this.updateStepOptions();
     this.isModalOpen = true;
+    
   }
 
   editStep(item: any) {
@@ -230,8 +290,12 @@ export class WorkflowManagementComponent implements OnInit {
       status: item.status !== undefined ? item.status : item.Status,
       updateAt: new Date(),
       updateBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId,
-      actionType:'E'
+      actionType:'E',
+      PreStepId: item.PreStepId || item.preStepId || '',
+      NextStepId: item.NextStepId || item.nextStepId || ''
     };
+    console.log('Editing step:', this.newStep);
+    this.updateStepOptions(); 
     this.isModalOpen = true;
   }
 
