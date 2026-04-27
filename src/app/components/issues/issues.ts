@@ -9,8 +9,9 @@ import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { RichTextEditorComponent } from '../shared/rich-text-editor/rich-text-editor';
 import { IssueHubService } from '../../services/issue-hub.service';
+import { SprintService, Sprint } from '../../services/sprint.service';
 import { switchMap, of, Subscription } from 'rxjs';
-
+import { Observable } from 'rxjs';
 @Component({
   selector: 'app-issues',
   standalone: true,
@@ -27,11 +28,14 @@ export class IssuesComponent implements OnInit, OnDestroy {
   attachments: any[] = [];
   histories: any[] = [];
   activeTab: 'comments' | 'history' = 'comments';
+  mainTab: 'issues' | 'backlog' | 'sprint' = 'issues';
   loading = true;
   project: any = null;
   searchTerm: string = '';
   isCreateModalOpen = false;
+  isCreateSprintModalOpen = false;
   isEditMode = false;
+  isEditSprintMode = false;
   issueTypes: any[] = [];
   issuePriorities: any[] = [];
   users: any[] = [];
@@ -39,6 +43,14 @@ export class IssuesComponent implements OnInit, OnDestroy {
   epics: any[] = [];
   allProjectIssues: any[] = [];
   newIssue: any = {};
+  newSprint: Sprint = {
+    sprintId: '',
+    projectId: '',
+    sprintName: '',
+    startDate: '',
+    endDate: '',
+    status: true
+  };
 
   // Editor states
   isEditingDescription = false;
@@ -53,6 +65,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private authService: AuthService,
     private hubService: IssueHubService,
+    private sprintService: SprintService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
@@ -156,7 +169,26 @@ scrollToComment() {
       (issue.issueId || issue.issue_id || issue.key || '').toLowerCase().includes(term)
     );
   }
-
+  getIssueBySprint(sprint: Sprint) {
+    if (!this.project) return;
+        this.baseService.loadComboboxData({
+      queries: [
+        "select * from issues where status is true and sprint_id = '"+ sprint.sprintId + "' order by update_at desc"
+      ],
+      keys: ["issues"]
+    }).subscribe(res => {
+      this.zone.run(() => {
+        if (res.success && res.data) {
+          this.allProjectIssues = res.data.issues || [];
+          
+          // Also load sprints using new service
+          this.loadSprints(this.project.projectId);
+          
+          this.cdr.detectChanges();
+        }
+      });
+    });
+   }
   loadDataFromParams() {
     const projectId = this.route.snapshot.paramMap.get('projectId');
     const issueIdFromRoute = this.route.snapshot.paramMap.get('issueId');
@@ -525,18 +557,20 @@ scrollToComment() {
     this.baseService.loadComboboxData({
       queries: [
         "select user_id, username, fullname from users where status is true",
-        "select sprint_id, sprint_name from sprints where project_id = '" + projectId + "'",
         "select issue_id, issue_name from issues where issue_type = 'EPIC' and project_id = '" + projectId + "'",
         "select issue_id, issue_name from issues where project_id = '" + projectId + "'"
       ],
-      keys: ["users", "sprints", "epics", "issues"]
+      keys: ["users", "epics", "issues"]
     }).subscribe(res => {
       this.zone.run(() => {
         if (res.success && res.data) {
           this.users = res.data.users || [];
-          this.sprints = res.data.sprints || [];
           this.epics = res.data.epics || [];
           this.allProjectIssues = res.data.issues || [];
+          
+          // Also load sprints using new service
+          this.loadSprints(projectId);
+          
           this.cdr.detectChanges();
         }
       });
@@ -680,5 +714,114 @@ scrollToComment() {
         }
       });
     });
+  }
+
+  switchTab(tab: 'issues' | 'backlog' | 'sprint') {
+    this.mainTab = tab;
+    if (tab === 'sprint') {
+      const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId');
+      if (projectId) {
+        this.loadSprints(projectId);
+      }
+    }
+    this.cdr.detectChanges();
+  }
+
+  loadSprints(projectId: string) {
+    this.sprintService.getSprints(projectId).subscribe(res => {
+      this.zone.run(() => {
+        if (res.success) {
+          this.sprints = res.data || [];
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
+
+  openCreateSprintModal() {
+    const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId');
+    if (!projectId) {
+      this.notificationService.warning('Please select a project first');
+      return;
+    }
+
+    this.isEditSprintMode = false;
+    const now = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(now.getDate() + 14);
+
+    this.newSprint = {
+      sprintId: 'SPR-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      projectId: projectId,
+      sprintName: '',
+      startDate: now.toISOString().slice(0, 16),
+      endDate: nextWeek.toISOString().slice(0, 16),
+      status: true,
+      createdAt: new Date(),
+      createdBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId,
+      updateAt: new Date(),
+      updateBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId
+    };
+    this.isCreateSprintModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openEditSprintModal(sprint: any) {
+    this.isEditSprintMode = true;
+    this.newSprint = {
+      ...sprint,
+      startDate: this.formatDateForInput(sprint.startDate),
+      endDate: this.formatDateForInput(sprint.endDate),
+      updateAt: new Date(),
+      updateBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId
+    };
+    this.isCreateSprintModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeCreateSprintModal() {
+    this.isCreateSprintModalOpen = false;
+  }
+saveNewSprint() {
+  if (!this.newSprint.sprintName) {
+    this.notificationService.warning('Sprint Name is required');
+    return;
+  }
+
+  const request= this.isEditSprintMode
+    ? this.sprintService.updateSprint(this.newSprint.sprintId, this.newSprint.projectId, this.newSprint)
+    : this.sprintService.createSprint(this.newSprint);
+
+  request.subscribe(res => {
+      this.zone.run(() => {
+        if (res.success) {
+          this.notificationService.success(this.isEditSprintMode ? 'Sprint updated successfully' : 'Sprint created successfully');
+          this.isCreateSprintModalOpen = false;
+          if (this.newSprint.projectId) {
+            this.loadSprints(this.newSprint.projectId);
+          }
+        } else {
+          this.notificationService.error('Error saving sprint: ' + res.message);
+        }
+      });
+    });
+  }
+
+  deleteSprint(sprintId: string) {
+    const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId');
+    if (!projectId) return;
+
+    if (confirm('Are you sure you want to delete this sprint?')) {
+      this.sprintService.deleteSprint(sprintId, projectId).subscribe(res => {
+        this.zone.run(() => {
+          if (res.success) {
+            this.notificationService.success('Sprint deleted successfully');
+            this.loadSprints(projectId);
+          } else {
+            this.notificationService.error('Error deleting sprint: ' + res.message);
+          }
+        });
+      });
+    }
   }
 }
