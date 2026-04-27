@@ -171,7 +171,11 @@ scrollToComment() {
   }
   getIssueBySprint(sprint: Sprint) {
     if (!this.project) return;
-        this.baseService.loadComboboxData({
+    this.loading = true;
+    this.mainTab = 'issues';
+    this.searchTerm = '';
+    
+    this.baseService.loadComboboxData({
       queries: [
         "select * from issues where status is true and sprint_id = '"+ sprint.sprintId + "' order by update_at desc"
       ],
@@ -179,11 +183,27 @@ scrollToComment() {
     }).subscribe(res => {
       this.zone.run(() => {
         if (res.success && res.data) {
-          this.allProjectIssues = res.data.issues || [];
+          const sprintIssues = res.data|| [];
+          this.issues = [...sprintIssues];
+          this.allProjectIssues = [...sprintIssues];
           
-          // Also load sprints using new service
-          this.loadSprints(this.project.projectId);
+          if (this.issues.length > 0) {
+            this.selectedIssue = null; // Reset to force refresh
+            this.selectIssue(this.issues[0]);
+          } else {
+            this.selectedIssue = null;
+            this.comments = [];
+            this.attachments = [];
+            this.histories = [];
+          }
           
+          // Match first load behavior by reloading project metadata
+          this.loadModalData(this.project.projectId);
+          
+          this.loading = false;
+          this.cdr.detectChanges();
+        } else {
+          this.loading = false;
           this.cdr.detectChanges();
         }
       });
