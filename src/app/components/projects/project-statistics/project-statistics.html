@@ -21,51 +21,141 @@
     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
   </div>
 
-  <div *ngIf="!isLoading" class="space-y-8 animate-in fade-in duration-500">
+  <div *ngIf="!isLoading" class="space-y-6 animate-in fade-in duration-500">
+    
+    <!-- Global Filter Toolbar -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-border flex flex-wrap items-center gap-6">
+      <div class="flex items-center space-x-3">
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Bộ lọc dự án:</span>
+        <div class="flex space-x-2">
+          <select [(ngModel)]="selectedSprintId" 
+            class="block pl-3 pr-10 py-2 text-xs border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg bg-gray-50 min-w-[150px]">
+            <option value="">Tất cả Sprint</option>
+            <option *ngFor="let s of sprints" [value]="s.sprintId">{{ s.sprintName }}</option>
+          </select>
+          <select [(ngModel)]="selectedEpicId" 
+            class="block pl-3 pr-10 py-2 text-xs border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg bg-gray-50 min-w-[150px]">
+            <option value="">Tất cả Epic</option>
+            <option *ngFor="let e of epics" [value]="e">{{ e }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="h-6 w-[1px] bg-gray-200 hidden md:block"></div>
+      <button (click)="onFilterChange()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Làm mới dữ liệu
+      </button>
+    </div>
+
+    <!-- AI Evaluation Section (Moved to Top) -->
+    <div class="bg-white p-8 rounded-2xl shadow-xl border border-indigo-100 overflow-hidden relative">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+      
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-3">
+          <div class="p-3 bg-indigo-50 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">AI Progress Analysis</h2>
+        </div>
+        <div class="flex space-x-3">
+          <button (click)="onEvaluateSprint()" [disabled]="!selectedSprintId || isEvaluating" 
+            class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-200">
+            Analyze Sprint
+          </button>
+          <button (click)="onEvaluateEpic()" [disabled]="!selectedEpicId || isEvaluating" 
+            class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-purple-200">
+            Analyze Epic
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="aiEvaluation" class="animate-in slide-in-from-bottom-4 duration-500">
+        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+          <div class="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
+            {{ aiEvaluation }}
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!aiEvaluation && !isEvaluating" class="text-center py-4 text-sm text-gray-400 italic">
+        Chọn Sprint hoặc Epic để AI tiến hành phân tích tiến độ...
+      </div>
+    </div>
+
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-border">
         <p class="text-[10px] font-bold text-text-secondary uppercase mb-1">Total Issues</p>
-        <p class="text-3xl font-bold text-text-primary">{{ issues.length }}</p>
+        <p class="text-3xl font-bold text-text-primary">{{ filteredIssues.length }}</p>
       </div>
       <div class="bg-white p-6 rounded-xl shadow-sm border border-border">
         <p class="text-[10px] font-bold text-text-secondary uppercase mb-1">Completion Rate</p>
-        <p class="text-3xl font-bold text-emerald-600">
-          {{ issues.length > 0 ? (issues | filterStatus:'DONE').length / issues.length * 100 : 0 | number:'1.0-0' }}%
-        </p>
+        <p class="text-3xl font-bold text-emerald-600">{{ completionRate }}%</p>
       </div>
     </div>
 
+    <!-- New Charts Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Chart 1: Status Distribution -->
+      <!-- Chart 1: Burndown -->
       <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
-        <h3 class="text-sm font-bold text-text-primary mb-6">Status Distribution</h3>
-        <div class="aspect-square max-h-[300px] mx-auto">
-          <canvas #statusChart></canvas>
+        <canvas #burndownChart></canvas>
+      </div>
+
+      <!-- Chart 2: Progress Doughnut -->
+      <div class="bg-white p-6 rounded-xl shadow-jira border border-border flex flex-col items-center justify-center">
+        <div class="w-full max-w-[280px]">
+          <canvas #progressChart></canvas>
         </div>
       </div>
 
-      <!-- Chart 2: Priority Distribution -->
+      <!-- Chart 3: Workload -->
       <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
-        <h3 class="text-sm font-bold text-text-primary mb-6">Issues by Priority</h3>
-        <div class="aspect-square max-h-[300px] mx-auto">
-          <canvas #priorityChart></canvas>
-        </div>
+        <canvas #workloadChart></canvas>
       </div>
 
-      <!-- Chart 3: Type Distribution -->
+      <!-- Chart 4: Risk -->
       <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
-        <h3 class="text-sm font-bold text-text-primary mb-6">Type Distribution</h3>
-        <div class="aspect-square max-h-[300px] mx-auto">
-          <canvas #typeChart></canvas>
+        <canvas #riskChart></canvas>
+      </div>
+    </div>
+
+    <!-- Bảng Lịch Deadline (Workflow Styles) -->
+    <div class="bg-white p-6 rounded-xl shadow-jira border border-border mt-8">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4">
+          <h3 class="text-sm font-bold text-text-primary uppercase tracking-wider">Lịch Deadline ({{ currentMonth | date:'MM/yyyy' }})</h3>
+          <div class="flex space-x-1">
+            <button (click)="prevMonth()" class="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+            <button (click)="nextMonth()" class="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <div class="flex items-center text-[9px] font-bold text-gray-500 uppercase"><span class="w-2 h-2 bg-[#10B981] rounded-full mr-1"></span> DONE</div>
+          <div class="flex items-center text-[9px] font-bold text-gray-500 uppercase"><span class="w-2 h-2 bg-[#EAB308] rounded-full mr-1"></span> IN PROGRESS</div>
+          <div class="flex items-center text-[9px] font-bold text-gray-500 uppercase"><span class="w-2 h-2 bg-[#EF4444] rounded-full mr-1"></span> REOPEN</div>
         </div>
       </div>
-
-      <!-- Chart 4: Time Estimation -->
-      <div class="bg-white p-6 rounded-xl shadow-jira border border-border">
-        <h3 class="text-sm font-bold text-text-primary mb-6">Time Estimation (Hours)</h3>
-        <div class="aspect-video max-h-[300px] mx-auto">
-          <canvas #timeChart></canvas>
+      
+      <div class="grid grid-cols-7 gap-2">
+        <div *ngFor="let dayName of ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']" class="text-center text-[10px] font-bold text-text-secondary py-2">{{ dayName }}</div>
+        
+        <div *ngFor="let dayObj of calendarDays" class="aspect-square border border-gray-50 rounded-lg p-1.5 min-h-[85px] relative hover:bg-gray-50 transition-colors overflow-y-auto">
+          <ng-container *ngIf="dayObj">
+            <span class="text-[10px] font-bold text-gray-300 absolute top-1 left-2">{{ dayObj.day }}</span>
+            <div class="mt-4 flex flex-col gap-1">
+              <div *ngFor="let task of dayObj.tasks" 
+                [style.backgroundColor]="task.color + '15'"
+                [style.borderColor]="task.color"
+                class="border-l-2 px-1.5 py-0.5 rounded-r text-[8px] font-bold truncate transition-all hover:scale-[1.02]"
+                [style.color]="task.color">
+                {{ task.id }}
+              </div>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
