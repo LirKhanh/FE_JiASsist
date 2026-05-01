@@ -73,4 +73,12 @@ export class IssueService {
       headers: { 'Content-Type': 'application/json' }
     });
   }
+
+  deleteComment(commentId: number): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(`/api/issues/comments/${commentId}`);
+  }
+
+  deleteAttachment(attachmentId: number): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(`/api/issues/attachments/${attachmentId}`);
+  }
 }

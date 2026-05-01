@@ -96,9 +96,9 @@ export class ProjectsComponent implements OnInit {
         
         this.notificationService.success('Project data loaded. Redirecting...');
         
-        // Navigate to the new URL structure
-        const issueId = latestIssueDetail?.issueId || 'all';
-        this.router.navigate([`/projects/${projectId}/issues/${issueId}`], { 
+        // Navigate to the old URL structure with /all
+        const issueId = 'all';
+        this.router.navigate(['/projects', projectId, 'issues', issueId], { 
           state: { 
             project: projectDetail,
             issues: issuesData.issues,

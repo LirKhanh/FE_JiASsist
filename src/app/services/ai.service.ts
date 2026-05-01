@@ -26,4 +26,8 @@ export class AiService {
   evaluateEpic(projectId: string, epicId: string): Observable<ApiResponse<string>> {
     return this.http.get<ApiResponse<string>>(`${this.apiUrl}evaluate-epic/${projectId}/${epicId}`);
   }
+
+  chatWithAi(projectId: string, payload: { sprintId?: string, epicId?: string, message: string }): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.apiUrl}chat/${projectId}`, payload);
+  }
 }

@@ -21,7 +21,7 @@ import { Observable } from 'rxjs';
 })
 export class IssuesComponent implements OnInit, OnDestroy {
   @ViewChild('commentEditor') commentEditor!: RichTextEditorComponent;
-  
+
   issues: any[] = [];
   selectedIssue: any | null = null;
   comments: any[] = [];
@@ -55,7 +55,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
   // Editor states
   isEditingDescription = false;
   editingCommentId: number | null = null;
-  
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -101,12 +101,12 @@ export class IssuesComponent implements OnInit, OnDestroy {
     this.hubService.stopConnection();
     this.subscriptions.unsubscribe();
   }
-scrollToComment() {
-  const el = document.getElementById('commentSection');
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth' }); // mượt
+  scrollToComment() {
+    const el = document.getElementById('commentSection');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' }); // mượt
+    }
   }
-}
   setupHubListeners() {
     this.subscriptions.add(
       this.hubService.issueUpdated$.subscribe(data => {
@@ -123,7 +123,7 @@ scrollToComment() {
             }
             this.cdr.detectChanges();
           }
-          
+
           const idx = this.issues.findIndex(i => (i.issueId || i.issue_id) === (data.issueId || data.issue_id));
           if (idx !== -1) {
             Object.assign(this.issues[idx], data);
@@ -164,29 +164,76 @@ scrollToComment() {
   get filteredIssues() {
     if (!this.searchTerm) return this.issues;
     const term = this.searchTerm.toLowerCase();
-    return this.issues.filter(issue => 
-      (issue.issueName || issue.issue_name || issue.summary || '').toLowerCase().includes(term) ||
-      (issue.issueId || issue.issue_id || issue.key || '').toLowerCase().includes(term)
+    return this.issues.filter(issue =>
+      (issue.issueId?.toLowerCase().includes(term)) ||
+      (issue.issueName?.toLowerCase().includes(term)) ||
+      (issue.description?.toLowerCase().includes(term))
     );
   }
+
+  get groupedIssues() {
+    // Sắp xếp issues theo pmRequestDate (mới nhất lên đầu)
+    const sortedIssues = [...this.issues].sort((a, b) => {
+      const dateA = new Date(a.pmRequestDate || a.pm_request_date || 0).getTime();
+      const dateB = new Date(b.pmRequestDate || b.pm_request_date || 0).getTime();
+      return dateB - dateA;
+    });
+
+    const groups: { [key: string]: { name: string, issues: any[] } } = {};
+
+    // Group "No Epic"
+    groups['no-epic'] = { name: 'Issues (No Epic)', issues: [] };
+
+    // Map epic names for lookup
+    const epicNameMap: { [key: string]: string } = {};
+    this.epics.forEach(e => {
+      const id = (e.issueId || e.issue_id || '').toString().trim();
+      epicNameMap[id] = e.issueName || e.issue_name;
+    });
+
+    // Assign issues to groups
+    sortedIssues.forEach(issue => {
+      const rawEid = issue.epicId || issue.epic_id;
+      const eid = rawEid ? rawEid.toString().trim() : null;
+
+      if (eid) {
+        if (!groups[eid]) {
+          groups[eid] = { name: epicNameMap[eid] || `Epic: ${eid}`, issues: [] };
+        }
+        groups[eid].issues.push(issue);
+      } else {
+        groups['no-epic'].issues.push(issue);
+      }
+    });
+
+    // Return sorted groups: epics first, no-epic last
+    const epicGroups = Object.keys(groups)
+      .filter(key => key !== 'no-epic' && groups[key].issues.length > 0)
+      .map(key => groups[key]);
+
+    const noEpicGroup = groups['no-epic'];
+
+    return [...epicGroups, noEpicGroup];
+  }
+
   getIssueBySprint(sprint: Sprint) {
     if (!this.project) return;
     this.loading = true;
     this.mainTab = 'issues';
     this.searchTerm = '';
-    
+
     this.baseService.loadComboboxData({
       queries: [
-        "select * from issues where status is true and sprint_id = '"+ sprint.sprintId + "' order by update_at desc"
+        "select * from issues where status is true and sprint_id = '" + sprint.sprintId + "' order by update_at desc"
       ],
       keys: ["issues"]
     }).subscribe(res => {
       this.zone.run(() => {
         if (res.success && res.data) {
-          const sprintIssues = res.data|| [];
+          const sprintIssues = res.data.issues || [];
           this.issues = [...sprintIssues];
           this.allProjectIssues = [...sprintIssues];
-          
+
           if (this.issues.length > 0) {
             this.selectedIssue = null; // Reset to force refresh
             this.selectIssue(this.issues[0]);
@@ -196,10 +243,10 @@ scrollToComment() {
             this.attachments = [];
             this.histories = [];
           }
-          
+
           // Match first load behavior by reloading project metadata
           this.loadModalData(this.project.projectId);
-          
+
           this.loading = false;
           this.cdr.detectChanges();
         } else {
@@ -208,7 +255,7 @@ scrollToComment() {
         }
       });
     });
-   }
+  }
   loadDataFromParams() {
     const projectId = this.route.snapshot.paramMap.get('projectId');
     const issueIdFromRoute = this.route.snapshot.paramMap.get('issueId');
@@ -230,16 +277,16 @@ scrollToComment() {
       switchMap((issuesRes: any) => {
         if (issuesRes.success && issuesRes.data) {
           this.issues = issuesRes.data.issues || [];
-          
+
           // Determine which issue to load details for
-          const targetId = (issueIdFromRoute && issueIdFromRoute !== 'all') 
-            ? issueIdFromRoute 
+          const targetId = (issueIdFromRoute && issueIdFromRoute !== 'all')
+            ? issueIdFromRoute
             : issuesRes.data.latestIssueId;
 
           if (targetId && targetId !== 'undefined' && targetId !== 'null') {
             return this.projectsService.getIssueDetail(targetId);
           }
-          
+
           // If no specific issue ID, but we have issues, load the first one
           if (this.issues.length > 0) {
             const firstId = this.issues[0].issueId || this.issues[0].issue_id || this.issues[0].id;
@@ -297,7 +344,7 @@ scrollToComment() {
     if (!issue) return;
     const issueId = issue.issueId || issue.issue_id || issue.id;
     const currentSelectedId = this.selectedIssue?.issueId || this.selectedIssue?.issue_id || this.selectedIssue?.id;
-    
+
     if (this.selectedIssue && (currentSelectedId === issueId) && this.comments.length > 0) {
       return;
     }
@@ -307,12 +354,13 @@ scrollToComment() {
     // Reset editor states
     this.isEditingDescription = false;
     this.editingCommentId = null;
-    
+
     // Clear comment editor content when switching issues
     if (this.commentEditor) {
       this.commentEditor.clear();
     }
 
+    this.loading = true;
     this.projectsService.getIssueDetail(issueId).subscribe(res => {
       this.zone.run(() => {
         if (res.success && res.data) {
@@ -327,6 +375,7 @@ scrollToComment() {
           this.attachments = [];
           this.histories = [];
         }
+        this.loading = false;
         this.cdr.detectChanges();
       });
     });
@@ -345,8 +394,10 @@ scrollToComment() {
       formData.append('files', file);
     });
 
+    this.loading = true;
     this.issueService.updateDescription(this.selectedIssue.issueId, formData).subscribe(res => {
       this.zone.run(() => {
+        this.loading = false;
         if (res.success) {
           this.notificationService.success('Description updated');
           this.isEditingDescription = false;
@@ -371,6 +422,7 @@ scrollToComment() {
       formData.append('files', file);
     });
 
+    this.loading = true;
     this.issueService.addComment(this.selectedIssue.issueId, formData).subscribe(res => {
       this.zone.run(() => {
         if (res.success) {
@@ -382,12 +434,18 @@ scrollToComment() {
               if (res.success && res.data) {
                 this.comments = res.data.comments || [];
                 this.attachments = res.data.attachments || [];
+                this.loading = false;
+                this.cdr.detectChanges();
+              } else {
+                this.loading = false;
                 this.cdr.detectChanges();
               }
             });
           });
         } else {
           this.notificationService.error('Failed to add comment');
+          this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     });
@@ -406,7 +464,7 @@ scrollToComment() {
         this.notificationService.success('Comment updated');
         this.editingCommentId = null;
         // Content will be updated via SignalR or we can update locally
-        const comment = this.comments.find(c => c.issueCommentId === commentId);
+        const comment = this.comments.find(c => (c.issueCommentId || c.issue_comment_id) === commentId);
         if (comment) comment.content = event.html;
         this.cdr.detectChanges();
       });
@@ -417,12 +475,60 @@ scrollToComment() {
     });
   }
 
+  deleteComment(commentId: number) {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+
+    this.loading = true;
+    this.issueService.deleteComment(commentId).subscribe(res => {
+      this.zone.run(() => {
+        this.loading = false;
+        if (res.success) {
+          this.notificationService.success('Comment deleted');
+          this.comments = this.comments.filter(c => (c.issueCommentId || c.issue_comment_id) !== commentId);
+        } else {
+          this.notificationService.error('Failed to delete comment');
+        }
+        this.cdr.detectChanges();
+      });
+    }, () => {
+      this.zone.run(() => {
+        this.loading = false;
+        this.notificationService.error('An error occurred while deleting the comment');
+        this.cdr.detectChanges();
+      });
+    });
+  }
+
+  deleteAttachment(attachmentId: number) {
+    if (!confirm('Are you sure you want to delete this attachment?')) return;
+
+    this.loading = true;
+    this.issueService.deleteAttachment(attachmentId).subscribe(res => {
+      this.zone.run(() => {
+        this.loading = false;
+        if (res.success) {
+          this.notificationService.success('Attachment deleted');
+          this.attachments = this.attachments.filter(a => (a.issueAttachmentId || a.issue_attachment_id) !== attachmentId);
+        } else {
+          this.notificationService.error('Failed to delete attachment');
+        }
+        this.cdr.detectChanges();
+      });
+    }, () => {
+      this.zone.run(() => {
+        this.loading = false;
+        this.notificationService.error('An error occurred while deleting the attachment');
+        this.cdr.detectChanges();
+      });
+    });
+  }
+
   getHistoryDetails(item: any) {
     try {
       const oldObj = JSON.parse(item.oldValue || '{}');
       const newObj = JSON.parse(item.newValue || '{}');
       const fields = Object.keys(newObj);
-      
+
       return fields.map(field => ({
         field: field.replace(/([A-Z])/g, ' $1').trim(), // camelCase to Space Case
         oldValue: oldObj[field] ?? 'None',
@@ -460,8 +566,8 @@ scrollToComment() {
     if (s.includes('REOPEN')) return 'bg-red-500 text-white';
     if (s.includes('OPEN')) return 'bg-blue-500 text-white';
     if (s.includes('INPROGRESS')) return 'bg-yellow-500 text-white';
-    if ((s.includes('INREVIEW') || s.includes('INTESTING'))&&!s.includes('BA')) return 'bg-purple-500 text-white';
-    if (s.includes('BA') ) return 'bg-cyan-500 text-white';
+    if ((s.includes('INREVIEW') || s.includes('INTESTING')) && !s.includes('BA')) return 'bg-purple-500 text-white';
+    if (s.includes('BA')) return 'bg-cyan-500 text-white';
     if (s.includes('DONE')) return 'bg-green-500 text-white';
     return 'bg-gray-400 text-white';
   }
@@ -469,16 +575,18 @@ scrollToComment() {
   updateIssueStatus(newStatus: string) {
     if (!this.selectedIssue || this.selectedIssue.issueStatus === newStatus) return;
 
-    const updatedIssue = { 
-      ...this.selectedIssue, 
+    const updatedIssue = {
+      ...this.selectedIssue,
       issueStatus: newStatus,
       updateAt: new Date(),
       updateBy: JSON.parse(localStorage.getItem('user') || '{}')?.userId
     };
 
     // Use the existing updateIssue API
+    this.loading = true;
     this.issueService.updateIssue(this.selectedIssue.issueId, updatedIssue).subscribe(res => {
       this.zone.run(() => {
+        this.loading = false;
         if (res.success) {
           this.notificationService.success(`Status updated to ${newStatus}`);
           this.selectedIssue.issueStatus = newStatus;
@@ -496,55 +604,55 @@ scrollToComment() {
     console.log(1);
     // REOPEN -> Red
     if (s === 'REOPEN') {
-      return { 
-        class: 'bg-red-100 text-red-700 border-red-200', 
+      return {
+        class: 'bg-red-100 text-red-700 border-red-200',
         icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-        color: '#DE350B' 
+        color: '#DE350B'
       };
     }
     // OPEN / TO DO -> Blue
     if (s === 'OPEN' || s === 'TO DO') {
-      return { 
-        class: 'bg-blue-100 text-blue-700 border-blue-200', 
+      return {
+        class: 'bg-blue-100 text-blue-700 border-blue-200',
         icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-        color: '#0052CC' 
+        color: '#0052CC'
       };
     }
     // IN PROGRESS -> Yellow
     if (s.includes('PROGRESS')) {
-      return { 
-        class: 'bg-amber-100 text-amber-700 border-amber-200', 
+      return {
+        class: 'bg-amber-100 text-amber-700 border-amber-200',
         icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-        color: '#FFAB00' 
+        color: '#FFAB00'
       };
     }
     // IN REVIEW / IN TESTING -> Purple
-    if ((s.includes('TESTING') || s.includes('REVIEW'))&&!s.includes('BA')) {
-      return { 
-        class: 'bg-purple-100 text-purple-700 border-purple-200', 
+    if ((s.includes('TESTING') || s.includes('REVIEW')) && !s.includes('BA')) {
+      return {
+        class: 'bg-purple-100 text-purple-700 border-purple-200',
         icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-        color: '#6554C0' 
+        color: '#6554C0'
       };
     }
-     // BA REVIEW / BA TESTING -> Purple
+    // BA REVIEW / BA TESTING -> Purple
     if (s.includes('BA')) {
-      return { 
-        class: 'bg-cyan-100 text-cyan-700 border-cyan-200', 
+      return {
+        class: 'bg-cyan-100 text-cyan-700 border-cyan-200',
         icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-        color: '#06b6d4' 
+        color: '#06b6d4'
       };
     }
     // DONE / RESOLVED -> Green
     if (s === 'DONE' || s === 'RESOLVED' || s === 'CLOSED') {
-      return { 
-        class: 'bg-green-100 text-green-700 border-green-200', 
+      return {
+        class: 'bg-green-100 text-green-700 border-green-200',
         icon: 'M5 13l4 4L19 7',
-        color: '#00875A' 
+        color: '#00875A'
       };
     }
 
-    return { 
-      class: 'bg-gray-100 text-gray-700 border-gray-200', 
+    return {
+      class: 'bg-gray-100 text-gray-700 border-gray-200',
       icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
       color: '#42526E'
     };
@@ -555,12 +663,12 @@ scrollToComment() {
   }
 
   getPriorityIcon(priority: string): string {
-    if (!priority) return 'text-gray-500';
+    if (!priority) return 'text-[#5e6c84]';
     const p = priority.toLowerCase();
-    if (p.includes('high') || p.includes('p1')) return 'text-red-500';
-    if (p.includes('medium') || p.includes('p2')) return 'text-orange-500';
-    if (p.includes('low') || p.includes('p3')) return 'text-blue-500';
-    return 'text-gray-500';
+    if (p.includes('high') || p.includes('highest') || p.includes('p1')) return 'text-[#de350b]';
+    if (p.includes('medium') || p.includes('p2')) return 'text-[#ff991f]';
+    if (p.includes('low') || p.includes('p3')) return 'text-[#0052cc]';
+    return 'text-[#5e6c84]';
   }
 
   private loadModalData(projectId: string) {
@@ -587,10 +695,10 @@ scrollToComment() {
           this.users = res.data.users || [];
           this.epics = res.data.epics || [];
           this.allProjectIssues = res.data.issues || [];
-          
+
           // Also load sprints using new service
           this.loadSprints(projectId);
-          
+
           this.cdr.detectChanges();
         }
       });
@@ -679,18 +787,18 @@ scrollToComment() {
     this.cdr.detectChanges();
   }
 
- private formatDateForInput(date: any): string {
-  if (!date) return '';
+  private formatDateForInput(date: any): string {
+    if (!date) return '';
 
-  const d = new Date(date);
-  const year = d.getUTCFullYear();
-  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  const hours = String(d.getUTCHours()).padStart(2, '0');
-  const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+    const d = new Date(date);
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const hours = String(d.getUTCHours()).padStart(2, '0');
+    const minutes = String(d.getUTCMinutes()).padStart(2, '0');
 
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
 
   closeCreateModal() {
     this.isCreateModalOpen = false;
@@ -712,25 +820,28 @@ scrollToComment() {
     if (this.isEditMode) {
       this.newIssue.issueId = this.newIssue.issueId || this.newIssue.issue_id;
     }
-    
+
     if (!this.newIssue.projectId) {
       this.newIssue.projectId = this.project?.projectId || this.newIssue.project_id;
 
     }
 
-    const request = this.isEditMode 
+    const request = this.isEditMode
       ? this.issueService.updateIssue(this.newIssue.issueId, this.newIssue)
       : this.issueService.saveIssue(this.newIssue);
     console.log(1);
+    this.loading = true;
     request.subscribe(res => {
       this.zone.run(() => {
         if (res.success) {
           this.notificationService.success(this.isEditMode ? 'Issue updated successfully' : 'Issue created successfully');
           this.isCreateModalOpen = false;
-          this.closeCreateModal()
-          this.loadDataFromParams(); // Refresh the list
+          this.closeCreateModal();
+          this.loadDataFromParams(); // Refresh the list - this will reset loading to false
         } else {
           this.notificationService.error('Error saving issue: ' + res.message);
+          this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     });
@@ -738,7 +849,7 @@ scrollToComment() {
 
   switchTab(tab: 'issues' | 'backlog' | 'sprint') {
     this.mainTab = tab;
-    if (tab === 'sprint') {
+    if (tab === 'sprint' || tab === 'backlog') {
       const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId');
       if (projectId) {
         this.loadSprints(projectId);
@@ -748,12 +859,14 @@ scrollToComment() {
   }
 
   loadSprints(projectId: string) {
+    this.loading = true;
     this.sprintService.getSprints(projectId).subscribe(res => {
       this.zone.run(() => {
+        this.loading = false;
         if (res.success) {
           this.sprints = res.data || [];
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     });
   }
@@ -802,18 +915,21 @@ scrollToComment() {
   closeCreateSprintModal() {
     this.isCreateSprintModalOpen = false;
   }
-saveNewSprint() {
-  if (!this.newSprint.sprintName) {
-    this.notificationService.warning('Sprint Name is required');
-    return;
-  }
 
-  const request= this.isEditSprintMode
-    ? this.sprintService.updateSprint(this.newSprint.sprintId, this.newSprint.projectId, this.newSprint)
-    : this.sprintService.createSprint(this.newSprint);
+  saveNewSprint() {
+    if (!this.newSprint.sprintName) {
+      this.notificationService.warning('Sprint Name is required');
+      return;
+    }
 
-  request.subscribe(res => {
+    this.loading = true;
+    const request = this.isEditSprintMode
+      ? this.sprintService.updateSprint(this.newSprint.sprintId, this.newSprint.projectId, this.newSprint)
+      : this.sprintService.createSprint(this.newSprint);
+
+    request.subscribe(res => {
       this.zone.run(() => {
+        this.loading = false;
         if (res.success) {
           this.notificationService.success(this.isEditSprintMode ? 'Sprint updated successfully' : 'Sprint created successfully');
           this.isCreateSprintModalOpen = false;
@@ -823,6 +939,7 @@ saveNewSprint() {
         } else {
           this.notificationService.error('Error saving sprint: ' + res.message);
         }
+        this.cdr.detectChanges();
       });
     });
   }

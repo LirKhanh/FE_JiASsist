@@ -31,6 +31,7 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
   @ViewChild('progressChart') progressChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('workloadChart') workloadChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('riskChart') riskChartCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chatContainer') chatContainer!: ElementRef;
 
   projectId: string = '';
   project: any = null;
@@ -48,9 +49,16 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
   epics: string[] = [];
   selectedSprintId: string = '';
   selectedEpicId: string = '';
-  aiEvaluation: string = '';
+  chatMessages: { role: 'user' | 'ai', content: string, isError?: boolean }[] = [];
+  chatInput: string = '';
   isEvaluating = false;
   usersMap: { [key: string]: string } = {};
+
+  // Chart instances
+  burndownChart: any;
+  progressChart: any;
+  workloadChart: any;
+  riskChart: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -60,7 +68,7 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
     private aiService: AiService,
     private baseService: BaseService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.projectId = this.route.snapshot.paramMap.get('projectId') || '';
@@ -100,7 +108,8 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
     this.projectsService.getIssuesByProjectId(this.projectId).subscribe({
       next: (res) => {
         if (res.success && res.data) {
-          this.issues = res.data.issues || [];
+          const rawIssues = res.data.issues || res.data.Issues || [];
+          this.issues = rawIssues.map((i: any) => this.mapToCamelCase(i));
           this.filteredIssues = [...this.issues];
           this.isLoading = false;
           this.calculateStatistics();
@@ -133,27 +142,100 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
 
   initCharts(): void {
     if (!this.burndownChartCanvas) return;
+
+    // Hủy các biểu đồ cũ nếu đã tồn tại
+    if (this.burndownChart) this.burndownChart.destroy();
+    if (this.progressChart) this.progressChart.destroy();
+    if (this.workloadChart) this.workloadChart.destroy();
+    if (this.riskChart) this.riskChart.destroy();
+
     this.createBurndownChart();
     this.createProgressChart();
     this.createWorkloadChart();
     this.createRiskChart();
   }
 
-  createBurndownChart(): void {
-    const labels = ['Bắt đầu', 'Tuần 1', 'Tuần 2', 'Tuần 3', 'Hiện tại'];
-    const idealData = [100, 75, 50, 25, 0];
-    const actualData = [100, 90, 70, 45, 30]; // Dữ liệu giả lập
+  private formatDateShort(date: Date): string {
+    return `${date.getDate()}/${date.getMonth() + 1}`;
+  }
 
-    new Chart(this.burndownChartCanvas.nativeElement, {
+  createBurndownChart(): void {
+    if (this.filteredIssues.length === 0) return;
+
+    // 1. Thiết lập khoảng thời gian 6 tuần (4 tuần trước -> hiện tại -> 1 tuần sau)
+    const now = new Date();
+    const startDate = new Date();
+    startDate.setDate(now.getDate() - (4 * 7)); // Lùi 4 tuần
+    startDate.setHours(0, 0, 0, 0);
+
+    const numSteps = 5; // 0, 1, 2, 3, 4 (Nay), 5 (Sau 1 tuần) -> Tổng 6 mốc
+    const labels: string[] = [];
+    const idealData: number[] = [];
+    const actualData: number[] = [];
+
+    const totalEstimate = this.filteredIssues.reduce((sum, i) => sum + (i.estimateDev || 0), 0);
+
+    for (let i = 0; i <= numSteps; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + (i * 7));
+
+      let label = this.formatDateShort(currentDate);
+      if (i === 4) label += " (Nay)";
+      labels.push(label);
+
+      // Ideal: Giảm dần đều từ tổng estimate về 0
+      idealData.push(Math.max(0, totalEstimate - (totalEstimate * (i / numSteps))));
+
+      // Actual: Tổng estimate - tổng estimate của các task đã DONE trước currentDate
+      const completedEstimate = this.filteredIssues
+        .filter(issue => {
+          const status = (issue.issueStatus || issue.issue_status || '').toUpperCase();
+          const updateDate = new Date(issue.updateAt || issue.update_at);
+          return status === 'DONE' && updateDate <= currentDate;
+        })
+        .reduce((sum, issue) => sum + (issue.estimateDev || 0), 0);
+
+      // Chỉ vẽ Actual cho đến mốc "Nay" (i=4)
+      if (i <= 4) {
+        actualData.push(totalEstimate - completedEstimate);
+      }
+    }
+
+    this.burndownChart = new Chart(this.burndownChartCanvas.nativeElement, {
       type: 'line',
       data: {
         labels: labels,
         datasets: [
-          { label: 'Lý tưởng', data: idealData, borderColor: '#CBD5E1', borderDash: [5, 5], fill: false },
-          { label: 'Thực tế', data: actualData, borderColor: '#4F46E5', backgroundColor: '#4F46E5', fill: true, tension: 0.4 }
+          {
+            label: 'Lý tưởng (h)',
+            data: idealData,
+            borderColor: '#CBD5E1',
+            borderDash: [5, 5],
+            fill: false,
+            pointRadius: 0
+          },
+          {
+            label: 'Thực tế (h)',
+            data: actualData,
+            borderColor: '#4F46E5',
+            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            fill: true,
+            tension: 0.2
+          }
         ]
       },
-      options: { responsive: true, plugins: { title: { display: true, text: 'Biểu đồ Burndown' } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: { display: true, text: 'Biểu đồ Burndown theo tuần' },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Giờ công (h)' } },
+          x: { title: { display: true, text: 'Mốc thời gian (Tuần)' } }
+        }
+      }
     });
   }
 
@@ -161,7 +243,7 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
     const done = this.filteredIssues.filter(i => (i.issueStatus || '').toUpperCase() === 'DONE').length;
     const remaining = this.filteredIssues.length - done;
 
-    new Chart(this.progressChartCanvas.nativeElement, {
+    this.progressChart = new Chart(this.progressChartCanvas.nativeElement, {
       type: 'doughnut',
       data: {
         labels: ['Hoàn thành', 'Còn lại'],
@@ -170,10 +252,10 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
           backgroundColor: ['#10B981', '#F1F5F9']
         }]
       },
-      options: { 
-        responsive: true, 
+      options: {
+        responsive: true,
         cutout: '80%',
-        plugins: { title: { display: true, text: 'Tổng tiến độ (%)' } } 
+        plugins: { title: { display: true, text: 'Tổng tiến độ (%)' } }
       }
     });
   }
@@ -186,7 +268,7 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
       userWorkload[userName] = (userWorkload[userName] || 0) + (i.estimateDev || 0);
     });
 
-    new Chart(this.workloadChartCanvas.nativeElement, {
+    this.workloadChart = new Chart(this.workloadChartCanvas.nativeElement, {
       type: 'bar',
       data: {
         labels: Object.keys(userWorkload),
@@ -210,7 +292,7 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
       else risks['Trung bình']++;
     });
 
-    new Chart(this.riskChartCanvas.nativeElement, {
+    this.riskChart = new Chart(this.riskChartCanvas.nativeElement, {
       type: 'bar',
       data: {
         labels: Object.keys(risks),
@@ -240,12 +322,12 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
           this.sprints = res.data.sprints || [];
           // Extract epic strings from the list of objects returned
           this.epics = (res.data.epics || []).map((e: any) => e.epicId);
-          
+
           const users = res.data.users || [];
           users.forEach((u: any) => {
             this.usersMap[u.userId] = u.username;
           });
-          
+
           this.cdr.detectChanges();
         }
       },
@@ -255,38 +337,56 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
     });
   }
 
+  scrollToBottom(): void {
+    setTimeout(() => {
+      if (this.chatContainer) {
+        this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
+      }
+    }, 100);
+  }
+
   onEvaluateSprint(): void {
     if (!this.selectedSprintId) return;
-    this.isEvaluating = true;
-    this.aiEvaluation = 'Evaluating progress with Gemini AI...';
-    this.aiService.evaluateSprint(this.projectId, this.selectedSprintId).subscribe({
-      next: (res) => {
-        this.aiEvaluation = res.data || 'No evaluation received.';
-        this.isEvaluating = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.notificationService.error('AI evaluation failed');
-        this.isEvaluating = false;
-        this.aiEvaluation = 'Error: Failed to get AI evaluation.';
-      }
-    });
+    const sprint = this.sprints.find(s => s.sprintId === this.selectedSprintId);
+    const sprintName = sprint ? sprint.sprintName : this.selectedSprintId;
+    this.chatInput = `Hãy phân tích tiến độ của Sprint: ${sprintName}`;
+    this.onSendMessage();
   }
 
   onEvaluateEpic(): void {
     if (!this.selectedEpicId) return;
+    this.chatInput = `Hãy phân tích tiến độ của Epic: ${this.selectedEpicId}`;
+    this.onSendMessage();
+  }
+
+  onSendMessage(): void {
+    if (!this.chatInput.trim() || this.isEvaluating) return;
+    
+    const userMessage = this.chatInput.trim();
+    this.chatMessages.push({ role: 'user', content: userMessage });
+    this.chatInput = '';
     this.isEvaluating = true;
-    this.aiEvaluation = 'Evaluating progress with Gemini AI...';
-    this.aiService.evaluateEpic(this.projectId, this.selectedEpicId).subscribe({
+    this.scrollToBottom();
+
+    const payload = {
+      sprintId: this.selectedSprintId || undefined,
+      epicId: this.selectedEpicId || undefined,
+      message: userMessage
+    };
+
+    this.aiService.chatWithAi(this.projectId, payload).subscribe({
       next: (res) => {
-        this.aiEvaluation = res.data || 'No evaluation received.';
+        this.chatMessages.push({ role: 'ai', content: res.data || 'Không nhận được dữ liệu đánh giá.' });
         this.isEvaluating = false;
+        this.scrollToBottom();
         this.cdr.detectChanges();
       },
       error: () => {
         this.notificationService.error('AI evaluation failed');
+        this.chatMessages.push({ role: 'ai', content: 'Lỗi: Không thể kết nối đến AI.', isError: true });
         this.isEvaluating = false;
-        this.aiEvaluation = 'Error: Failed to get AI evaluation.';
+        this.scrollToBottom();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -302,16 +402,44 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
     this.completionRate = Math.floor(rawRate * 1000) / 1000;
   }
 
+  mapToCamelCase(i: any): any {
+    if (!i) return i;
+    return {
+      issueId: i.issue_id || i.issueId,
+      projectId: i.project_id || i.projectId,
+      issueName: i.issue_name || i.issueName,
+      issueStatus: i.issue_status || i.issueStatus,
+      issueType: i.issue_type || i.issueType,
+      sprintId: i.sprint_id || i.sprintId,
+      epicId: i.epic_id || i.epicId,
+      estimateDev: i.estimate_dev || i.estimateDev,
+      estimateTest: i.estimate_test || i.estimateTest,
+      assigneeId: i.assignee_id || i.assigneeId,
+      deadlineDev: i.deadline_dev || i.deadlineDev,
+      updateAt: i.update_at || i.updateAt,
+      ...i
+    };
+  }
+
   onFilterChange(): void {
-    // Luôn lấy toàn bộ dữ liệu dự án cho Biểu đồ và Lịch
-    let query = `select * from issues where status is true and project_id = '${this.projectId}' order by update_at desc`;
+    let query = `select * from issues where status = true and project_id = '${this.projectId}'`;
+    
+    if (this.selectedSprintId) {
+      query += ` and sprint_id = '${this.selectedSprintId}'`;
+    }
+    if (this.selectedEpicId) {
+      query += ` and epic_id = '${this.selectedEpicId}'`;
+    }
+    
+    query += ` order by update_at desc`;
 
     this.baseService.loadComboboxData({
       queries: [query],
       keys: ["issues"]
     }).subscribe(res => {
       if (res.success && res.data) {
-        this.filteredIssues = res.data.issues || [];
+        const rawIssues = res.data.issues || res.data.Issues || [];
+        this.filteredIssues = rawIssues.map((i: any) => this.mapToCamelCase(i));
         this.calculateStatistics();
         this.generateCalendar();
         this.cdr.detectChanges();
@@ -325,17 +453,17 @@ export class ProjectStatisticsComponent implements OnInit, AfterViewInit {
     const month = this.currentMonth.getMonth();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     this.calendarDays = [];
     for (let i = 0; i < firstDay; i++) this.calendarDays.push(null);
-    
+
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
       const dayIssues = this.filteredIssues.filter(i => {
         const deadline = i.deadlineDev || i.deadline_dev;
         return deadline && deadline.startsWith(dateStr);
       });
-      
+
       this.calendarDays.push({
         day: d,
         tasks: dayIssues.map(i => ({

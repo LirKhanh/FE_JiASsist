@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DashboardService } from '../../services/dashboard.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,25 +10,54 @@ import { CommonModule } from '@angular/common';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class DashboardComponent {
-  recentIssues = [
-    { key: 'JA-101', summary: 'Fix login performance', status: 'IN PROGRESS', priority: 'High' },
-    { key: 'JA-102', summary: 'Add navigation bar', status: 'TO DO', priority: 'Medium' },
-    { key: 'JA-103', summary: 'Update dashboard colors', status: 'DONE', priority: 'Low' }
-  ];
+export class DashboardComponent implements OnInit {
+  isLoading = true;
+  projects: any[] = [];
+  dynamicFilters: any[] = [];
 
-  assignedToMe = [
-    { key: 'JA-104', summary: 'Create Jira Overview', status: 'IN PROGRESS', priority: 'High' },
-    { key: 'JA-105', summary: 'Fix CSS bugs', status: 'TO DO', priority: 'Medium' }
-  ];
+  constructor(
+    private dashboardService: DashboardService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  projects = [
-    { name: 'JiAssist FE', type: 'Software', lead: 'Admin' },
-    { name: 'JiAssist BE', type: 'Service', lead: 'Developer' }
-  ];
+  ngOnInit() {
+    this.loadDashboardData();
+  }
 
-  updates = [
-    { user: 'Admin', action: 'Created issue', target: 'JA-106', time: '2h ago' },
-    { user: 'Dev', action: 'Changed status', target: 'JA-101', time: '4h ago' }
-  ];
+  loadDashboardData() {
+    const user = this.authService.getUser();
+    if (!user) {
+      this.isLoading = false;
+      return;
+    }
+
+    this.isLoading = true;
+    this.dashboardService.getDashboardSummary(user.userId).subscribe({
+      next: (res: any) => {
+        const isSuccess = res.success !== undefined ? res.success : res.Success;
+        const data = res.data || res.Data || res;
+        
+        if (isSuccess !== false && data) {
+          this.projects = data.projects || data.Projects || [];
+          this.dynamicFilters = data.dynamicFilters || data.DynamicFilters || [];
+        } else if (res.projects || res.dynamicFilters) {
+          this.projects = res.projects || [];
+          this.dynamicFilters = res.dynamicFilters || [];
+        }
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải dashboard:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getAvatar(name: string): string {
+    if (!name) return 'https://ui-avatars.com/api/?name=U&background=0052CC&color=fff';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0052CC&color=fff`;
+  }
 }

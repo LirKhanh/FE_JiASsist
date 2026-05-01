@@ -1,34 +1,40 @@
 <div class="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-white">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="fixed inset-0 bg-white/60 z-[100] flex justify-center items-center backdrop-blur-[1px]">
+    <div class="flex flex-col items-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <p class="mt-4 text-primary font-bold text-sm tracking-widest uppercase">Processing...</p>
+    </div>
+  </div>
+
   <!-- Filter Bar -->
   <div class="px-6 py-4 border-b border-border flex items-center space-x-4 bg-white z-10 shrink-0">
     <!-- Navigation Tabs -->
     <div class="flex items-center space-x-1 mr-4 border-r border-border pr-4">
-      <button (click)="switchTab('issues')" title="Issues" 
-              [class.bg-secondary]="mainTab === 'issues'"
-              [class.text-primary]="mainTab === 'issues'"
-              [class.border-primary/20]="mainTab === 'issues'"
-              class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors font-bold text-sm border border-transparent hover:bg-gray-100">
+      <button (click)="switchTab('issues')" title="Issues" [class.bg-secondary]="mainTab === 'issues'"
+        [class.text-primary]="mainTab === 'issues'" [class.border-primary/20]="mainTab === 'issues'"
+        class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors font-bold text-sm border border-transparent hover:bg-gray-100">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
         </svg>
         <span class="hidden lg:inline">Issues</span>
       </button>
-      <button (click)="switchTab('backlog')" title="Go to Backlog"
-              [class.bg-secondary]="mainTab === 'backlog'"
-              [class.text-primary]="mainTab === 'backlog'"
-              [class.border-primary/20]="mainTab === 'backlog'"
-              class="flex items-center space-x-2 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-100 transition-colors font-medium text-sm group border border-transparent">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      <button (click)="switchTab('backlog')" title="Go to Backlog" [class.bg-secondary]="mainTab === 'backlog'"
+        [class.text-primary]="mainTab === 'backlog'" [class.border-primary-20]="mainTab === 'backlog'"
+        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-100 transition-colors font-medium text-sm group border border-transparent">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-primary transition-colors" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
         </svg>
         <span class="hidden lg:inline">Backlog</span>
       </button>
-      <button (click)="switchTab('sprint')" title="Go to Sprint"
-              [class.bg-secondary]="mainTab === 'sprint'"
-              [class.text-primary]="mainTab === 'sprint'"
-              [class.border-primary/20]="mainTab === 'sprint'"
-              class="flex items-center space-x-2 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-100 transition-colors font-medium text-sm group border border-transparent">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button (click)="switchTab('sprint')" title="Go to Sprint" [class.bg-secondary]="mainTab === 'sprint'"
+        [class.text-primary]="mainTab === 'sprint'" [class.border-primary-20]="mainTab === 'sprint'"
+        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-100 transition-colors font-medium text-sm group border border-transparent">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-primary transition-colors" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
         <span class="hidden lg:inline">Sprint</span>
@@ -40,17 +46,14 @@
       <div class="search-wrapper">
         <div class="search-icon-box">
           <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11.5 7C11.5 9.48528 9.48528 11.5 7 11.5C4.51472 11.5 2.5 9.48528 2.5 7C2.5 4.51472 4.51472 2.5 7 2.5C9.48528 2.5 11.5 4.51472 11.5 7Z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M10.1436 10.1436L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path
+              d="M11.5 7C11.5 9.48528 9.48528 11.5 7 11.5C4.51472 11.5 2.5 9.48528 2.5 7C2.5 4.51472 4.51472 2.5 7 2.5C9.48528 2.5 11.5 4.51472 11.5 7Z"
+              stroke="currentColor" stroke-width="1.5" />
+            <path d="M10.1436 10.1436L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
         </div>
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          placeholder="Search issues, tasks, or IDs..." 
-          class="search-input"
-          spellcheck="false"
-        >
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Search issues, tasks, or IDs..." class="search-input"
+          spellcheck="false">
         <div class="search-hint">
           <kbd>Ctrl</kbd>
           <kbd>K</kbd>
@@ -58,7 +61,8 @@
       </div>
     </div>
     <div class="flex items-center space-x-2">
-      <select class="bg-gray-50 border border-border px-3 py-2 rounded-lg text-sm font-medium text-text-primary focus:border-primary outline-none">
+      <select
+        class="bg-gray-50 border border-border px-3 py-2 rounded-lg text-sm font-medium text-text-primary focus:border-primary outline-none">
         <option>All Statuses</option>
         <option>Open</option>
         <option>In Progress</option>
@@ -67,884 +71,1073 @@
     </div>
     <div class="flex-grow"></div>
     <div class="flex items-center space-x-3">
-        <button (click)="openCreateModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all">
-          Create Issue
-        </button>
+      <button (click)="openCreateModal()"
+        class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all">
+        Create Issue
+      </button>
     </div>
   </div>
 
   <div class="flex flex-grow overflow-hidden">
     @if (mainTab === 'issues') {
-      <!-- 2/12: Issue List (Left) -->
-      <div class="w-[16.666667%] border-r border-border overflow-y-auto bg-gray-50/30">
-        <div class="divide-y divide-border">
-          @for (issue of filteredIssues; track (issue.issueId || issue.issue_id || issue.id)) {
-            <div (click)="selectIssue(issue)" 
-                 [class.bg-blue-50]="(selectedIssue?.issueId || selectedIssue?.issue_id || selectedIssue?.id) === (issue.issueId || issue.issue_id || issue.id)"
-                 [class.border-l-4]="(selectedIssue?.issueId || selectedIssue?.issue_id || selectedIssue?.id) === (issue.issueId || issue.issue_id || issue.id)"
-                 class="p-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-primary/0 border-l-4">
-              <div class="flex items-start justify-between mb-1">
-                <span class="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{{ issue.issueId || issue.issue_id || issue.key }}</span>
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border flex items-center"
-                      [ngClass]="getStatusClass(issue.issueStatus || issue.issue_status || issue.status)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getStatusConfig(issue.issueStatus || issue.issue_status || issue.status).icon" />
-                  </svg>
-                  {{ issue.issueStatus || issue.issue_status || issue.status }}
-                </span>
-              </div>
-              <p class="text-xs font-semibold text-text-primary line-clamp-2">{{ issue.issueName || issue.issue_name || issue.summary }}</p>
-              <div class="mt-2 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <span [ngClass]="getPriorityIcon(issue.issuePriorityId || issue.issue_priority_id || issue.priority)">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 fill-current" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                    </svg>
-                  </span>
-                  <span class="text-[10px] text-text-secondary">{{ issue.issueType || issue.issue_type || issue.type }}</span>
-                </div>
-              </div>
+    <!-- 2/12: Issue List (Left) -->
+    <div class="w-[16.666667%] border-r border-border overflow-y-auto bg-gray-50/30">
+      <div class="divide-y divide-border">
+        @for (issue of filteredIssues; track (issue.issueId || issue.issue_id || issue.id)) {
+        <div (click)="selectIssue(issue)"
+          [class.bg-blue-50]="(selectedIssue?.issueId || selectedIssue?.issue_id || selectedIssue?.id) === (issue.issueId || issue.issue_id || issue.id)"
+          [class.border-l-4]="(selectedIssue?.issueId || selectedIssue?.issue_id || selectedIssue?.id) === (issue.issueId || issue.issue_id || issue.id)"
+          class="p-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-primary/0 border-l-4">
+          <div class="flex items-start justify-between mb-1">
+            <span class="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{{ issue.issueId ||
+              issue.issue_id || issue.key }}</span>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide flex items-center border"
+              [ngClass]="getStatusClass(issue.issueStatus || issue.issue_status || issue.status)">
+              {{ issue.issueStatus || issue.issue_status || issue.status }}
+            </span>
+          </div>
+          <p class="text-xs font-semibold text-text-primary line-clamp-2">{{ issue.issueName || issue.issue_name ||
+            issue.summary }}</p>
+          <div class="mt-2 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+
+              <!-- Priority Icon -->
+              <span [ngClass]="getPriorityIcon(issue.issuePriorityId || issue.issue_priority_id || issue.priority)"
+                class="font-bold text-xs">
+                <span
+                  *ngIf="(issue.issuePriorityId || issue.issue_priority_id || issue.priority || '').toLowerCase().includes('high')">↑</span>
+                <span
+                  *ngIf="(issue.issuePriorityId || issue.issue_priority_id || issue.priority || '').toLowerCase().includes('medium')">=</span>
+                <span
+                  *ngIf="(issue.issuePriorityId || issue.issue_priority_id || issue.priority || '').toLowerCase().includes('low')">↓</span>
+                <span *ngIf="!(issue.issuePriorityId || issue.issue_priority_id || issue.priority)">-</span>
+              </span>
+              <span class="text-[10px] text-text-secondary truncate max-w-[80px]">{{ issue.issueType || issue.issue_type
+                || issue.type }}</span>
             </div>
-          }
-          @if (filteredIssues.length === 0) {
-            <div class="p-4 text-center text-text-secondary text-xs italic">
-              {{ searchTerm ? 'No matches found.' : 'No issues found.' }}
-            </div>
-          }
+          </div>
         </div>
+        }
+        @if (filteredIssues.length === 0) {
+        <div class="p-4 text-center text-text-secondary text-xs italic">
+          {{ searchTerm ? 'No matches found.' : 'No issues found.' }}
+        </div>
+        }
       </div>
+    </div>
 
-      <!-- 8/12: Issue Detail Content (Middle) -->
-      <div class="w-[66.666667%] overflow-y-auto bg-white p-8 border-r border-border">
-        @if (selectedIssue) {
-          <div class="max-w-4xl mx-auto">
-            <nav class="flex text-xs text-text-secondary mb-4 space-x-2">
-              <span>Projects</span>
-              <span>/</span>
-              <span class="hover:underline cursor-pointer">{{ project?.projectName || project?.project_name || 'Project' }}</span>
-              <span>/</span>
-              <span class="text-primary font-medium">{{ selectedIssue.issueId }}</span>
-            </nav>
-            
-            <h1 class="text-2xl font-bold text-text-primary mb-6">{{ selectedIssue.issueName }}</h1>
+    <!-- 8/12: Issue Detail Content (Middle) -->
+    <div class="w-[66.666667%] overflow-y-auto bg-white p-8 border-r border-border">
+      @if (selectedIssue) {
+      <div class="max-w-4xl mx-auto">
+        <nav class="flex text-xs text-text-secondary mb-4 space-x-2">
+          <span>Projects</span>
+          <span>/</span>
+          <span class="hover:underline cursor-pointer">{{ project?.projectName || project?.project_name || 'Project'
+            }}</span>
+          <span>/</span>
+          <span class="text-primary font-medium">{{ selectedIssue.issueId }}</span>
+        </nav>
 
-            <div class="flex space-x-3 mb-8">
-              <button (click)="openEditModal(selectedIssue)" class="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded text-sm font-semibold flex items-center border border-border transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                Edit
-              </button>
-              <button (click)="scrollToComment(); commentEditor.clear()" class="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded text-sm font-semibold flex items-center border border-border transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Comment
-              </button>
-              <div class="border-l border-border mx-2"></div>
-              
-              <!-- Workflow Transition UI -->
-              <div class="flex items-center space-x-3">
-                <!-- Previous Step Button -->
-                @if (getPreviousStep(); as preStep) {
-                  <button 
-                    (click)="updateIssueStatus(preStep.stepId)"
-                    class="group flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-text-secondary hover:text-primary hover:border-primary transition-all duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span class="text-xs font-bold uppercase tracking-tight">{{ preStep.stepName }}</span>
-                  </button>
-                }
+        <h1 class="text-2xl font-bold text-text-primary mb-6">{{ selectedIssue.issueName }}</h1>
 
-                <!-- Current Status Label (Non-clickable) -->
-                <div 
-                  [ngClass]="getStepColor(selectedIssue.issueStatus)"
-                  class="flex items-center px-4 py-1.5 rounded-full border shadow-sm ring-2 ring-offset-2 ring-primary/10">
-                  <span class="text-xs font-black uppercase tracking-widest">{{ getCurrentStep()?.stepName || selectedIssue.issueStatus }}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-
-                <!-- Next Step Button -->
-                @if (getNextStep(); as nextStep) {
-                  <button 
-                    (click)="updateIssueStatus(nextStep.stepId)"
-                    class="group flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-text-secondary hover:text-primary hover:border-primary transition-all duration-200">
-                    <span class="text-xs font-bold uppercase tracking-tight">{{ nextStep.stepName }}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                }
-              </div>
-            </div>
-
-            <!-- Additional Info Grid (All non-null fields except People/Dates/Desc) -->
-            <div class="mb-10 bg-gray-50/50 rounded-xl border border-border p-6">
-              <h3 class="text-sm font-bold text-text-primary mb-4 border-b border-border pb-2">Issue Information</h3>
-              <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                @if (selectedIssue.issueType) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Type</label>
-                    <span class="text-sm font-medium text-text-primary">{{ selectedIssue.issueType }}</span>
-                  </div>
-                }
-                @if (selectedIssue.sprintId) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Sprint</label>
-                    <span class="text-sm font-bold text-primary">{{ selectedIssue.sprintId }}</span>
-                  </div>
-                }
-                @if (selectedIssue.epicId) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Epic</label>
-                    <span class="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">{{ selectedIssue.epicId }}</span>
-                  </div>
-                }
-                @if (selectedIssue.issueDevRate) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Dev Rate</label>
-                    <span class="text-sm font-medium text-text-primary">{{ selectedIssue.issueDevRate }}</span>
-                  </div>
-                }
-                @if (selectedIssue.issueTestRate) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Test Rate</label>
-                    <span class="text-sm font-medium text-text-primary">{{ selectedIssue.issueTestRate }}</span>
-                  </div>
-                }
-                @if (selectedIssue.estimateDev) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Est. Dev (h)</label>
-                    <span class="text-sm font-medium text-text-primary">{{ selectedIssue.estimateDev }}h</span>
-                  </div>
-                }
-                @if (selectedIssue.estimateTest) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Est. Test (h)</label>
-                    <span class="text-sm font-medium text-text-primary">{{ selectedIssue.estimateTest }}h</span>
-                  </div>
-                }
-                @if (selectedIssue.estimateReopenDev) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Reopen Dev</label>
-                    <span class="text-sm font-medium text-red-500">{{ selectedIssue.estimateReopenDev }}h</span>
-                  </div>
-                }
-                @if (selectedIssue.estimateReopenTest) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Reopen Test</label>
-                    <span class="text-sm font-medium text-red-500">{{ selectedIssue.estimateReopenTest }}h</span>
-                  </div>
-                }
-                @if (selectedIssue.projectId) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Project Code</label>
-                    <span class="text-sm font-medium text-text-primary">{{ selectedIssue.projectId }}</span>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <!-- Description Section -->
-            <div class="mb-10 group/desc">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-bold text-text-primary">Description</h3>
-                <button *ngIf="!isEditingDescription" (click)="isEditingDescription = true" class="text-xs text-primary font-medium hover:underline opacity-0 group-hover/desc:opacity-100 transition-opacity">
-                  Edit
-                </button>
-              </div>
-              
-              <div *ngIf="!isEditingDescription" 
-                   (click)="isEditingDescription = true"
-                   class="prose prose-sm max-w-none border border-transparent hover:border-gray-200 rounded-lg p-3 cursor-text transition-all min-h-[100px]"
-                   [innerHTML]="selectedIssue.description || '<p class=&quot;text-gray-400 italic&quot;>Add a description...</p>'">
-              </div>
-
-              <div *ngIf="isEditingDescription" class="animate-in fade-in zoom-in-95 duration-200">
-                <app-rich-text-editor 
-                  [content]="selectedIssue.description" 
-                  saveLabel="Save"
-                  (save)="saveDescription($event)"
-                  (onCancel)="isEditingDescription = false"
-                ></app-rich-text-editor>
-              </div>
-            </div>
-
-            @if (attachments.length > 0) {
-              <div class="mb-10">
-                <h3 class="text-sm font-bold text-text-primary mb-4">Attachments ({{ attachments.length }})</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  @for (attr of attachments; track attr.issueAttachmentId) {
-                    <div class="flex flex-col border border-border rounded-lg overflow-hidden hover:shadow-md transition-all group">
-                      <!-- Preview Area -->
-                      <div class="h-32 bg-gray-50 flex items-center justify-center overflow-hidden relative">
-                        @if (isImage(attr.fileName)) {
-                          <img [src]="'https://localhost:44367/' + attr.filePath" 
-                               class="w-full h-full object-cover transition-transform group-hover:scale-105" 
-                               alt="Attachment">
-                        } @else {
-                          <div class="flex flex-col items-center text-text-secondary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span class="text-[10px] font-bold uppercase">{{ attr.fileName.split('.').pop() }}</span>
-                          </div>
-                        }
-                        
-                        <!-- Overlay Actions -->
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
-                          <a [href]="'https://localhost:44367/' + attr.filePath" 
-                             [download]="attr.fileName"
-                             target="_blank"
-                             class="p-2 bg-white rounded-full text-text-primary hover:bg-primary hover:text-white transition-colors shadow-sm"
-                             title="Download">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                          </a>
-                        </div>
-                      </div>
-                      
-                      <!-- File Info -->
-                      <div class="p-2 bg-white border-t border-border">
-                        <p class="text-[11px] font-semibold text-text-primary truncate" [title]="attr.fileName">{{ attr.fileName }}</p>
-                        <p class="text-[9px] text-text-secondary">{{ attr.createdAt | date:'MMM d, y' }}</p>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-            
-            <!-- Activity Tabbed Section -->
-            <div class="pt-8 border-t border-border">
-                <div class="flex items-center space-x-6 border-b border-border mb-6" id="commentSection">
-                  <button (click)="activeTab = 'comments'" 
-                          [class.border-primary]="activeTab === 'comments'"
-                          [class.text-primary]="activeTab === 'comments'"
-                          class="pb-3 px-1 text-sm font-bold border-b-2 border-transparent transition-all">
-                    Comments ({{ comments.length }})
-                  </button>
-                  <button (click)="activeTab = 'history'" 
-                          [class.border-primary]="activeTab === 'history'"
-                          [class.text-primary]="activeTab === 'history'"
-                          class="pb-3 px-1 text-sm font-bold border-b-2 border-transparent transition-all">
-                    History ({{ histories.length }})
-                  </button>
-                </div>
-                
-                <div class="min-h-[200px]">
-                  @if (activeTab === 'comments') {
-                    <div class="space-y-6 mb-8">
-                      @for (comment of comments; track comment.issueCommentId) {
-                        <div class="flex space-x-4 animate-in fade-in duration-300 group/comment">
-                          <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 border border-primary/10">
-                            {{ (comment.userId || 'U').charAt(0) }}
-                          </div>
-                          <div class="flex-grow">
-                            <div class="flex items-center justify-between mb-1">
-                              <div class="flex items-center space-x-2">
-                                <span class="text-sm font-bold text-text-primary">{{ comment.userId }}</span>
-                                <span class="text-xs text-text-secondary">{{ comment.createdAt | date:'MMM d, y, h:mm a' }}</span>
-                              </div>
-                              <div class="flex items-center space-x-2 opacity-0 group-hover/comment:opacity-100 transition-opacity">
-                                <button (click)="startEditComment(comment)" class="text-[10px] text-gray-500 hover:text-primary font-medium">Edit</button>
-                              </div>
-                            </div>
-
-                            <div *ngIf="editingCommentId !== comment.issueCommentId" 
-                                 class="text-sm text-text-primary leading-relaxed prose prose-sm max-w-none"
-                                 [innerHTML]="comment.content">
-                            </div>
-
-                            <div *ngIf="editingCommentId === comment.issueCommentId" class="mt-2">
-                               <app-rich-text-editor 
-                                  [content]="comment.content" 
-                                  saveLabel="Update"
-                                  (save)="saveEditedComment(comment.issueCommentId, $event)"
-                                  (onCancel)="editingCommentId = null"
-                                ></app-rich-text-editor>
-                            </div>
-                          </div>
-                        </div>
-                      }
-
-                      <!-- New Comment Editor -->
-                      <div class="flex space-x-4 pt-4 border-t border-gray-100">
-                          <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
-                            {{ (selectedIssue.reporterId || 'A').charAt(0) }}
-                          </div>
-                          <div class="flex-grow">
-                              <app-rich-text-editor 
-                                #commentEditor
-                                [showCancel]="false"
-                                placeholder="Add a comment..." 
-                                saveLabel="Add Comment"
-                                (save)="addComment($event)"
-                              ></app-rich-text-editor>
-                          </div>
-                      </div>
-                    </div>
-                  } @else {
-                    <div class="space-y-4 animate-in slide-in-from-left-2 duration-300">
-                      @for (item of histories; track item.issueHistoryId) {
-                        <div class="p-5 bg-white border border-border rounded-xl hover:shadow-md transition-all">
-                          <!-- History Header -->
-                          <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
-                            <div class="flex items-center space-x-2">
-                              <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary border border-primary/20">
-                                {{ (item.userId || 'U').charAt(0) }}
-                              </div>
-                              <div>
-                                <p class="text-xs font-bold text-text-primary">{{ item.userId }}</p>
-                                <p class="text-[10px] text-text-secondary">{{ item.createdAt | date:'MMM d, y, h:mm a' }}</p>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <!-- Changes Grid -->
-                          <div class="space-y-4">
-                            @for (change of getHistoryDetails(item); track change.field) {
-                              <div class="animate-in fade-in duration-500">
-                                <label class="text-[10px] font-bold text-text-secondary uppercase mb-2 block tracking-tight">
-                                  {{ change.field }}
-                                </label>
-                                <div class="grid grid-cols-2 gap-4">
-                                  <!-- Old Value Column -->
-                                  <div class="relative">
-                                    <div class="p-2.5 bg-red-50/50 border border-red-100 rounded-lg text-xs text-red-700 break-words opacity-70">
-                                      {{ change.oldValue }}
-                                    </div>
-                                    <div class="absolute -right-2 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-0.5 border border-border">
-                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <!-- New Value Column -->
-                                  <div class="p-2.5 bg-green-50/50 border border-green-200 rounded-lg text-xs text-green-800 font-bold break-words">
-                                    {{ change.newValue }}
-                                  </div>
-                                </div>
-                              </div>
-                            }
-                            @if (getHistoryDetails(item).length === 0) {
-                              <p class="text-xs text-text-secondary italic">Details updated</p>
-                            }
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  }
-                </div>
-            </div>
-          </div>
-        } @else {
-          <div class="h-full flex flex-col items-center justify-center text-text-secondary opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div class="flex space-x-3 mb-8">
+          <button (click)="openEditModal(selectedIssue)"
+            class="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded text-sm font-semibold flex items-center border border-border transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
-            <p class="text-lg font-medium">Select an issue to view details</p>
-          </div>
-        }
-      </div>
+            Edit
+          </button>
+          <button (click)="scrollToComment(); commentEditor.clear()"
+            class="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded text-sm font-semibold flex items-center border border-border transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Comment
+          </button>
+          <div class="border-l border-border mx-2"></div>
 
-      <!-- 2/12: Details Sidebar (Right) - Focus on People and Dates -->
-      <div class="w-[16.666667%] overflow-y-auto bg-gray-50/30 p-6">
-        @if (selectedIssue) {
-          <div class="space-y-8">
-            <!-- People Group -->
-            <section>
-              <h3 class="text-xs font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                People
-              </h3>
-              
-              <div class="space-y-4">
-                <!-- Assignee -->
-                <div>
-                  <label class="text-[10px] font-bold text-text-secondary block mb-2 uppercase tracking-wide">Assignee</label>
-                  <div class="flex items-center space-x-2">
-                    <div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold shadow-sm">
-                      {{ (selectedIssue.assigneeId || 'U').charAt(0) }}
-                    </div>
-                    <span class="text-xs font-bold text-text-primary">{{ selectedIssue.assigneeId || 'Unassigned' }}</span>
-                  </div>
-                </div>
-
-                <!-- Reporter -->
-                <div>
-                  <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Reporter</label>
-                  <div class="flex items-center space-x-2">
-                    <div class="w-6 h-6 rounded-full bg-gray-200 text-text-secondary flex items-center justify-center text-[10px] font-bold">
-                      {{ (selectedIssue.reporterId || 'R').charAt(0) }}
-                    </div>
-                    <span class="text-xs font-medium text-text-primary">{{ selectedIssue.reporterId }}</span>
-                  </div>
-                </div>
-
-                <!-- Developer -->
-                @if (selectedIssue.developerId) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Developer</label>
-                    <span class="text-xs font-medium text-text-primary">{{ selectedIssue.developerId }}</span>
-                  </div>
-                }
-
-                <!-- Tester -->
-                @if (selectedIssue.testerId) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Tester</label>
-                    <span class="text-xs font-medium text-text-primary">{{ selectedIssue.testerId }}</span>
-                  </div>
-                }
-
-                <!-- BA -->
-                @if (selectedIssue.baId) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Business Analyst</label>
-                    <span class="text-xs font-medium text-text-primary">{{ selectedIssue.baId }}</span>
-                  </div>
-                }
-              </div>
-            </section>
-
-            <!-- Dates Group -->
-            <section class="pt-6 border-t border-border">
-              <h3 class="text-xs font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Dates
-              </h3>
-              
-              <div class="space-y-4">
-                @if (selectedIssue.deadlineDev) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Deadline Dev</label>
-                    <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">{{ selectedIssue.deadlineDev | date:'MMM d, y' }}</span>
-                  </div>
-                }
-                @if (selectedIssue.deadlineTest) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Deadline Test</label>
-                    <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded">{{ selectedIssue.deadlineTest | date:'MMM d, y' }}</span>
-                  </div>
-                }
-                @if (selectedIssue.pmRequestDate) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">PM Request</label>
-                    <span class="text-xs text-text-primary">{{ selectedIssue.pmRequestDate | date:'MMM d, y' }}</span>
-                  </div>
-                }
-                @if (selectedIssue.cusRequestDate) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Customer Request</label>
-                    <span class="text-xs text-text-primary">{{ selectedIssue.cusRequestDate | date:'MMM d, y' }}</span>
-                  </div>
-                }
-                <div>
-                  <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Created</label>
-                  <span class="text-xs text-text-secondary">{{ selectedIssue.createdAt | date:'MMM d, y, h:mm a' }}</span>
-                </div>
-                @if (selectedIssue.updateAt) {
-                  <div>
-                    <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Updated</label>
-                    <span class="text-xs text-text-secondary">{{ selectedIssue.updateAt | date:'MMM d, y, h:mm a' }}</span>
-                  </div>
-                }
-              </div>
-            </section>
-          </div>
-        }
-      </div>
-    } @else if (mainTab === 'sprint') {
-      <div class="flex-grow p-8 bg-gray-50 overflow-y-auto">
-        <div class="max-w-6xl mx-auto">
-          <div class="flex justify-between items-center mb-8">
-            <div>
-              <h2 class="text-2xl font-bold text-text-primary">Sprint Management</h2>
-              <p class="text-text-secondary text-sm">Create and manage your project sprints</p>
-            </div>
-            <button (click)="openCreateSprintModal()" class="bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          <!-- Workflow Transition UI -->
+          <div class="flex items-center space-x-3">
+            <!-- Previous Step Button -->
+            @if (getPreviousStep(); as preStep) {
+            <button (click)="updateIssueStatus(preStep.stepId)"
+              class="group flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-text-secondary hover:text-primary hover:border-primary transition-all duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
-              Create Sprint
+              <span class="text-xs font-bold uppercase tracking-tight">{{ preStep.stepName }}</span>
+            </button>
+            }
+
+            <!-- Current Status Label (Non-clickable) -->
+            <div [ngClass]="getStepColor(selectedIssue.issueStatus)"
+              class="flex items-center px-4 py-1.5 rounded-full border shadow-sm ring-2 ring-offset-2 ring-primary/10">
+              <span class="text-xs font-black uppercase tracking-widest">{{ getCurrentStep()?.stepName ||
+                selectedIssue.issueStatus }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 ml-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <!-- Next Step Button -->
+            @if (getNextStep(); as nextStep) {
+            <button (click)="updateIssueStatus(nextStep.stepId)"
+              class="group flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-text-secondary hover:text-primary hover:border-primary transition-all duration-200">
+              <span class="text-xs font-bold uppercase tracking-tight">{{ nextStep.stepName }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 ml-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            }
+          </div>
+        </div>
+
+        <!-- Additional Info Grid (All non-null fields except People/Dates/Desc) -->
+        <div class="mb-10 bg-gray-50/50 rounded-xl border border-border p-6">
+          <h3 class="text-sm font-bold text-text-primary mb-4 border-b border-border pb-2">Issue Information</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+            @if (selectedIssue.issueType) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Type</label>
+              <span class="text-sm font-medium text-text-primary">{{ selectedIssue.issueType }}</span>
+            </div>
+            }
+            @if (selectedIssue.sprintId) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Sprint</label>
+              <span class="text-sm font-bold text-primary">{{ selectedIssue.sprintId }}</span>
+            </div>
+            }
+            @if (selectedIssue.epicId) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Epic</label>
+              <span
+                class="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">{{
+                selectedIssue.epicId }}</span>
+            </div>
+            }
+            @if (selectedIssue.issueDevRate) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Dev Rate</label>
+              <span class="text-sm font-medium text-text-primary">{{ selectedIssue.issueDevRate }}</span>
+            </div>
+            }
+            @if (selectedIssue.issueTestRate) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Test Rate</label>
+              <span class="text-sm font-medium text-text-primary">{{ selectedIssue.issueTestRate }}</span>
+            </div>
+            }
+            @if (selectedIssue.estimateDev) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Est. Dev (h)</label>
+              <span class="text-sm font-medium text-text-primary">{{ selectedIssue.estimateDev }}h</span>
+            </div>
+            }
+            @if (selectedIssue.estimateTest) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Est. Test (h)</label>
+              <span class="text-sm font-medium text-text-primary">{{ selectedIssue.estimateTest }}h</span>
+            </div>
+            }
+            @if (selectedIssue.estimateReopenDev) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Reopen Dev</label>
+              <span class="text-sm font-medium text-red-500">{{ selectedIssue.estimateReopenDev }}h</span>
+            </div>
+            }
+            @if (selectedIssue.estimateReopenTest) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Reopen Test</label>
+              <span class="text-sm font-medium text-red-500">{{ selectedIssue.estimateReopenTest }}h</span>
+            </div>
+            }
+            @if (selectedIssue.projectId) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Project Code</label>
+              <span class="text-sm font-medium text-text-primary">{{ selectedIssue.projectId }}</span>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Description Section -->
+        <div class="mb-10 group/desc">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-text-primary">Description</h3>
+            <button *ngIf="!isEditingDescription" (click)="isEditingDescription = true"
+              class="text-xs text-primary font-medium hover:underline opacity-0 group-hover/desc:opacity-100 transition-opacity">
+              Edit
             </button>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @for (sprint of sprints; track sprint.sprintId) {
-              <div class="bg-white rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-all group relative">
-                <div class="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 class="font-bold text-text-primary text-lg">{{ sprint.sprintName }}</h3>
-                    <span class="text-[10px] font-black text-text-secondary uppercase tracking-widest">{{ sprint.sprintId }}</span>
-                  </div>
-                  <div class="flex flex-col items-end space-y-2">
-                    <span [class]="sprint.status ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'" 
-                          class="px-2 py-1 rounded-full text-[10px] font-bold uppercase">
-                      {{ sprint.status ? 'Active' : 'Closed' }}
-                    </span>
-                    <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button (click)="openEditSprintModal(sprint)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Edit Sprint">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          <div *ngIf="!isEditingDescription" (click)="isEditingDescription = true"
+            class="prose prose-sm max-w-none border border-transparent hover:border-gray-200 rounded-lg p-3 cursor-text transition-all min-h-[100px]"
+            [innerHTML]="selectedIssue.description || '<p class=&quot;text-gray-400 italic&quot;>Add a description...</p>'">
+          </div>
+
+          <div *ngIf="isEditingDescription" class="animate-in fade-in zoom-in-95 duration-200">
+            <app-rich-text-editor [content]="selectedIssue.description" saveLabel="Save"
+              (save)="saveDescription($event)" (onCancel)="isEditingDescription = false"></app-rich-text-editor>
+          </div>
+        </div>
+
+        @if (attachments.length > 0) {
+        <div class="mb-10">
+          <h3 class="text-sm font-bold text-text-primary mb-4">Attachments ({{ attachments.length }})</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            @for (attr of attachments; track attr.issueAttachmentId) {
+            <div
+              class="flex flex-col border border-border rounded-lg overflow-hidden hover:shadow-md transition-all group">
+              <!-- Preview Area -->
+              <div class="h-32 bg-gray-50 flex items-center justify-center overflow-hidden relative">
+                @if (isImage(attr.fileName)) {
+                <img [src]="'https://localhost:44367/' + attr.filePath"
+                  class="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Attachment">
+                } @else {
+                <div class="flex flex-col items-center text-text-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span class="text-[10px] font-bold uppercase">{{ attr.fileName.split('.').pop() }}</span>
+                </div>
+                }
+
+                <!-- Overlay Actions -->
+                <div
+                  class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                  <a [href]="'https://localhost:44367/' + attr.filePath" [download]="attr.fileName" target="_blank"
+                    class="p-2 bg-white rounded-full text-text-primary hover:bg-primary hover:text-white transition-colors shadow-sm"
+                    title="Download">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </a>
+                  <button (click)="deleteAttachment(attr.issueAttachmentId || attr.issue_attachment_id)"
+                    class="p-2 bg-white rounded-full text-text-primary hover:bg-red-500 hover:text-white transition-colors shadow-sm"
+                    title="Delete">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- File Info -->
+              <div class="p-2 bg-white border-t border-border">
+                <p class="text-[11px] font-semibold text-text-primary truncate" [title]="attr.fileName">{{ attr.fileName
+                  }}</p>
+                <p class="text-[9px] text-text-secondary">{{ attr.createdAt | date:'MMM d, y' }}</p>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- Activity Tabbed Section -->
+        <div class="pt-8 border-t border-border">
+          <div class="flex items-center space-x-6 border-b border-border mb-6" id="commentSection">
+            <button (click)="activeTab = 'comments'" [class.border-primary]="activeTab === 'comments'"
+              [class.text-primary]="activeTab === 'comments'"
+              class="pb-3 px-1 text-sm font-bold border-b-2 border-transparent transition-all">
+              Comments ({{ comments.length }})
+            </button>
+            <button (click)="activeTab = 'history'" [class.border-primary]="activeTab === 'history'"
+              [class.text-primary]="activeTab === 'history'"
+              class="pb-3 px-1 text-sm font-bold border-b-2 border-transparent transition-all">
+              History ({{ histories.length }})
+            </button>
+          </div>
+
+          <div class="min-h-[200px]">
+            @if (activeTab === 'comments') {
+            <div class="space-y-6 mb-8">
+              @for (comment of comments; track comment.issueCommentId) {
+              <div class="flex space-x-4 animate-in fade-in duration-300 group/comment">
+                <div
+                  class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 border border-primary/10">
+                  {{ (comment.userId || 'U').charAt(0) }}
+                </div>
+                <div class="flex-grow">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-sm font-bold text-text-primary">{{ comment.userId }}</span>
+                      <span class="text-xs text-text-secondary">{{ comment.createdAt | date:'MMM d, y, h:mm a' }}</span>
+                    </div>
+                    <div
+                      class="flex items-center space-x-1 opacity-0 group-hover/comment:opacity-100 transition-opacity">
+                      <button (click)="startEditComment(comment)" title="Edit comment"
+                        class="p-1.5 text-text-secondary hover:text-primary hover:bg-primary/5 rounded-md transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                       </button>
-                      <button (click)="deleteSprint(sprint.sprintId)" class="p-1.5 text-red-600 hover:bg-red-50 rounded" title="Delete Sprint">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <button (click)="deleteComment(comment.issueCommentId || comment.issue_comment_id)"
+                        title="Delete comment"
+                        class="p-1.5 text-text-secondary hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
                   </div>
+
+                  <div *ngIf="editingCommentId !== comment.issueCommentId"
+                    class="text-sm text-text-primary leading-relaxed prose prose-sm max-w-none"
+                    [innerHTML]="comment.content">
+                  </div>
+
+                  <div *ngIf="editingCommentId === comment.issueCommentId" class="mt-2">
+                    <app-rich-text-editor [content]="comment.content" saveLabel="Update"
+                      (save)="saveEditedComment(comment.issueCommentId, $event)"
+                      (onCancel)="editingCommentId = null"></app-rich-text-editor>
+                  </div>
                 </div>
-                
-                <div class="space-y-3 mb-6">
-                  <div class="flex items-center text-sm text-text-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>{{ sprint.startDate | date:'MMM d' }} - {{ sprint.endDate | date:'MMM d, y' }}</span>
+              </div>
+              }
+
+              <!-- New Comment Editor -->
+              <div class="flex space-x-4 pt-4 border-t border-gray-100">
+                <div
+                  class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
+                  {{ (selectedIssue.reporterId || 'A').charAt(0) }}
+                </div>
+                <div class="flex-grow">
+                  <app-rich-text-editor #commentEditor [showCancel]="false" placeholder="Add a comment..."
+                    saveLabel="Add Comment" (save)="addComment($event)"></app-rich-text-editor>
+                </div>
+              </div>
+            </div>
+            } @else {
+            <div class="space-y-4 animate-in slide-in-from-left-2 duration-300">
+              @for (item of histories; track item.issueHistoryId) {
+              <div class="p-5 bg-white border border-border rounded-xl hover:shadow-md transition-all">
+                <!-- History Header -->
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+                  <div class="flex items-center space-x-2">
+                    <div
+                      class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary border border-primary/20">
+                      {{ (item.userId || 'U').charAt(0) }}
+                    </div>
+                    <div>
+                      <p class="text-xs font-bold text-text-primary">{{ item.userId }}</p>
+                      <p class="text-[10px] text-text-secondary">{{ item.createdAt | date:'MMM d, y, h:mm a' }}</p>
+                    </div>
                   </div>
                 </div>
 
-                <div class="pt-4 border-t border-border flex justify-end">
-                  <button (click)="getIssueBySprint(sprint)" class="text-primary text-sm font-bold hover:underline">View Issues</button>
+                <!-- Changes Grid -->
+                <div class="space-y-4">
+                  @for (change of getHistoryDetails(item); track change.field) {
+                  <div class="animate-in fade-in duration-500">
+                    <label class="text-[10px] font-bold text-text-secondary uppercase mb-2 block tracking-tight">
+                      {{ change.field }}
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                      <!-- Old Value Column -->
+                      <div class="relative">
+                        <div
+                          class="p-2.5 bg-red-50/50 border border-red-100 rounded-lg text-xs text-red-700 break-words opacity-70">
+                          {{ change.oldValue }}
+                        </div>
+                        <div
+                          class="absolute -right-2 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-0.5 border border-border">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                      <!-- New Value Column -->
+                      <div
+                        class="p-2.5 bg-green-50/50 border border-green-200 rounded-lg text-xs text-green-800 font-bold break-words">
+                        {{ change.newValue }}
+                      </div>
+                    </div>
+                  </div>
+                  }
+                  @if (getHistoryDetails(item).length === 0) {
+                  <p class="text-xs text-text-secondary italic">Details updated</p>
+                  }
                 </div>
               </div>
-            }
-            @if (sprints.length === 0) {
-              <div class="col-span-full py-20 bg-white rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center text-text-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <p class="text-lg font-medium">No sprints created yet</p>
-                <button (click)="openCreateSprintModal()" class="mt-4 text-primary font-bold hover:underline">Create your first sprint</button>
-              </div>
+              }
+            </div>
             }
           </div>
         </div>
       </div>
+      } @else {
+      <div class="h-full flex flex-col items-center justify-center text-text-secondary opacity-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mb-4" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="text-lg font-medium">Select an issue to view details</p>
+      </div>
+      }
+    </div>
+
+    <!-- 2/12: Details Sidebar (Right) - Focus on People and Dates -->
+    <div class="w-[16.666667%] overflow-y-auto bg-gray-50/30 p-6">
+      @if (selectedIssue) {
+      <div class="space-y-8">
+        <!-- People Group -->
+        <section>
+          <h3 class="text-xs font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            People
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Assignee -->
+            <div>
+              <label
+                class="text-[10px] font-bold text-text-secondary block mb-2 uppercase tracking-wide">Assignee</label>
+              <div class="flex items-center space-x-2">
+                <div
+                  class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold shadow-sm">
+                  {{ (selectedIssue.assigneeId || 'U').charAt(0) }}
+                </div>
+                <span class="text-xs font-bold text-text-primary">{{ selectedIssue.assigneeId || 'Unassigned' }}</span>
+              </div>
+            </div>
+
+            <!-- Reporter -->
+            <div>
+              <label
+                class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Reporter</label>
+              <div class="flex items-center space-x-2">
+                <div
+                  class="w-6 h-6 rounded-full bg-gray-200 text-text-secondary flex items-center justify-center text-[10px] font-bold">
+                  {{ (selectedIssue.reporterId || 'R').charAt(0) }}
+                </div>
+                <span class="text-xs font-medium text-text-primary">{{ selectedIssue.reporterId }}</span>
+              </div>
+            </div>
+
+            <!-- Developer -->
+            @if (selectedIssue.developerId) {
+            <div>
+              <label
+                class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Developer</label>
+              <span class="text-xs font-medium text-text-primary">{{ selectedIssue.developerId }}</span>
+            </div>
+            }
+
+            <!-- Tester -->
+            @if (selectedIssue.testerId) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Tester</label>
+              <span class="text-xs font-medium text-text-primary">{{ selectedIssue.testerId }}</span>
+            </div>
+            }
+
+            <!-- BA -->
+            @if (selectedIssue.baId) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Business
+                Analyst</label>
+              <span class="text-xs font-medium text-text-primary">{{ selectedIssue.baId }}</span>
+            </div>
+            }
+          </div>
+        </section>
+
+        <!-- Dates Group -->
+        <section class="pt-6 border-t border-border">
+          <h3 class="text-xs font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Dates
+          </h3>
+
+          <div class="space-y-4">
+            @if (selectedIssue.deadlineDev) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Deadline
+                Dev</label>
+              <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">{{ selectedIssue.deadlineDev |
+                date:'MMM d, y' }}</span>
+            </div>
+            }
+            @if (selectedIssue.deadlineTest) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Deadline
+                Test</label>
+              <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded">{{
+                selectedIssue.deadlineTest | date:'MMM d, y' }}</span>
+            </div>
+            }
+            @if (selectedIssue.pmRequestDate) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">PM
+                Request</label>
+              <span class="text-xs text-text-primary">{{ selectedIssue.pmRequestDate | date:'MMM d, y' }}</span>
+            </div>
+            }
+            @if (selectedIssue.cusRequestDate) {
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Customer
+                Request</label>
+              <span class="text-xs text-text-primary">{{ selectedIssue.cusRequestDate | date:'MMM d, y' }}</span>
+            </div>
+            }
+            <div>
+              <label
+                class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Created</label>
+              <span class="text-xs text-text-secondary">{{ selectedIssue.createdAt | date:'MMM d, y, h:mm a' }}</span>
+            </div>
+            @if (selectedIssue.updateAt) {
+            <div>
+              <label
+                class="text-[10px] font-bold text-text-secondary block mb-1 uppercase tracking-wide">Updated</label>
+              <span class="text-xs text-text-secondary">{{ selectedIssue.updateAt | date:'MMM d, y, h:mm a' }}</span>
+            </div>
+            }
+          </div>
+        </section>
+      </div>
+      }
+    </div>
+    } @else if (mainTab === 'backlog') {
+    <div class="flex-grow p-8 bg-gray-50 overflow-y-auto">
+      <div class="max-w-5xl mx-auto space-y-8">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-text-primary">Backlog (by Epic)</h2>
+        </div>
+
+        @for (group of groupedIssues; track group.name) {
+        <div class="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+          <div class="bg-gray-50 px-6 py-3 border-b border-border flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span class="font-bold text-text-primary uppercase tracking-wider">{{ group.name }}</span>
+              <span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full font-bold">{{
+                group.issues.length }} Issues</span>
+            </div>
+          </div>
+
+          <div class="divide-y divide-border">
+            @for (issue of group.issues; track (issue.issueId || issue.issue_id)) {
+            <div (click)="switchTab('issues'); selectIssue(issue)"
+              class="p-4 hover:bg-blue-50/30 cursor-pointer transition-all flex items-center group">
+              <div class="flex items-center space-x-3 flex-grow">
+                <span class="text-[10px] font-bold text-text-secondary w-20 shrink-0">{{ issue.issueId || issue.issue_id
+                  }}</span>
+                <span class="text-sm font-semibold text-text-primary group-hover:text-primary transition-colors">{{
+                  issue.issueName || issue.issue_name }}</span>
+              </div>
+              <div class="flex items-center space-x-4">
+                <!-- Issue Type Icon -->
+                <div
+                  [ngClass]="{'bg-[#e5493a]': (issue.issueType || issue.issue_type || '').toUpperCase() === 'BUG', 'bg-[#57d9a3]': (issue.issueType || issue.issue_type || '').toUpperCase() === 'STORY', 'bg-[#4bade8]': (issue.issueType || issue.issue_type || '').toUpperCase() !== 'BUG' && (issue.issueType || issue.issue_type || '').toUpperCase() !== 'STORY'}"
+                  class="w-4 h-4 rounded-sm flex items-center justify-center text-white text-[10px] shrink-0">
+                  <span *ngIf="(issue.issueType || issue.issue_type || '').toUpperCase() === 'BUG'">•</span>
+                  <span *ngIf="(issue.issueType || issue.issue_type || '').toUpperCase() === 'STORY'">★</span>
+                  <span
+                    *ngIf="(issue.issueType || issue.issue_type || '').toUpperCase() !== 'BUG' && (issue.issueType || issue.issue_type || '').toUpperCase() !== 'STORY'">✓</span>
+                </div>
+                <!-- Priority Icon -->
+                <span [ngClass]="getPriorityIcon(issue.issuePriorityId || issue.issue_priority_id)"
+                  class="font-bold text-sm w-4 text-center">
+                  <span
+                    *ngIf="(issue.issuePriorityId || issue.issue_priority_id || '').toLowerCase().includes('high')">↑</span>
+                  <span
+                    *ngIf="(issue.issuePriorityId || issue.issue_priority_id || '').toLowerCase().includes('medium')">=</span>
+                  <span
+                    *ngIf="(issue.issuePriorityId || issue.issue_priority_id || '').toLowerCase().includes('low')">↓</span>
+                </span>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border"
+                  [ngClass]="getStatusClass(issue.issueStatus || issue.issue_status)">
+                  {{ issue.issueStatus || issue.issue_status }}
+                </span>
+                <div
+                  class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                  {{ (issue.assigneeId || issue.assignee_id || 'U').charAt(0) }}
+                </div>
+              </div>
+            </div>
+            }
+            @if (group.issues.length === 0) {
+            <div class="p-8 text-center text-text-secondary text-xs italic">
+              No issues in this section.
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    } @else if (mainTab === 'sprint') {
+    <div class="flex-grow p-8 bg-gray-50 overflow-y-auto">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h2 class="text-2xl font-bold text-text-primary">Sprint Management</h2>
+            <p class="text-text-secondary text-sm">Create and manage your project sprints</p>
+          </div>
+          <button (click)="openCreateSprintModal()"
+            class="bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Create Sprint
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (sprint of sprints; track sprint.sprintId) {
+          <div
+            class="bg-white rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-all group relative">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="font-bold text-text-primary text-lg">{{ sprint.sprintName }}</h3>
+                <span class="text-[10px] font-black text-text-secondary uppercase tracking-widest">{{ sprint.sprintId
+                  }}</span>
+              </div>
+              <div class="flex flex-col items-end space-y-2">
+                <span [class]="sprint.status ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'"
+                  class="px-2 py-1 rounded-full text-[10px] font-bold uppercase">
+                  {{ sprint.status ? 'Active' : 'Closed' }}
+                </span>
+                <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button (click)="openEditSprintModal(sprint)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                    title="Edit Sprint">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button (click)="deleteSprint(sprint.sprintId)" class="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                    title="Delete Sprint">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3 mb-6">
+              <div class="flex items-center text-sm text-text-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>{{ sprint.startDate | date:'MMM d' }} - {{ sprint.endDate | date:'MMM d, y' }}</span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-border flex justify-end">
+              <button (click)="getIssueBySprint(sprint)" class="text-primary text-sm font-bold hover:underline">View
+                Issues</button>
+            </div>
+          </div>
+          }
+          @if (sprints.length === 0) {
+          <div
+            class="col-span-full py-20 bg-white rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center text-text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 opacity-20" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <p class="text-lg font-medium">No sprints created yet</p>
+            <button (click)="openCreateSprintModal()" class="mt-4 text-primary font-bold hover:underline">Create your
+              first sprint</button>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
     }
   </div>
 
   <!-- Create Issue Modal -->
   @if (isCreateModalOpen) {
-    <div class="fixed inset-0 z-[100] overflow-y-auto">
-      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true" (click)="closeCreateModal()">
-          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
+  <div class="fixed inset-0 z-[100] overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true" (click)="closeCreateModal()">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
 
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-border">
-          <div class="bg-white px-8 pt-6 pb-8">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-bold text-text-primary">{{ isEditMode ? 'Edit Issue' : 'Create Issue' }}</h3>
-              <button (click)="closeCreateModal()" class="text-text-secondary hover:text-text-primary transition-colors">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+      <div
+        class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-border">
+        <div class="bg-white px-8 pt-6 pb-8">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-text-primary">{{ isEditMode ? 'Edit Issue' : 'Create Issue' }}</h3>
+            <button (click)="closeCreateModal()" class="text-text-secondary hover:text-text-primary transition-colors">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Issue ID (Read-only) -->
+            <div>
+              <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Issue ID (System
+                Generated)</label>
+              <input type="text" [value]="newIssue.issueId" readonly
+                class="w-full bg-gray-50 border border-border rounded-lg px-4 py-2.5 text-sm font-bold text-primary cursor-not-allowed">
             </div>
 
-            <div class="space-y-6">
-              <!-- Issue ID (Read-only) -->
-              <div>
-                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Issue ID (System Generated)</label>
-                <input type="text" [value]="newIssue.issueId" readonly
-                       class="w-full bg-gray-50 border border-border rounded-lg px-4 py-2.5 text-sm font-bold text-primary cursor-not-allowed">
-              </div>
+            <!-- Summary/Name -->
+            <div>
+              <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Summary <span
+                  class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="newIssue.issueName" placeholder="What needs to be done?"
+                class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+            </div>
 
-              <!-- Summary/Name -->
+            <!-- Issue Type & Priority -->
+            <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Summary <span class="text-red-500">*</span></label>
-                <input type="text" [(ngModel)]="newIssue.issueName" placeholder="What needs to be done?"
-                       class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Issue
+                  Type</label>
+                <select [(ngModel)]="newIssue.issueType"
+                  class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                  @for (type of issueTypes; track (type.issueTypeId || type)) {
+                  <option [value]="type.issueTypeId || type">{{ type.issueTypeName || type }}</option>
+                  }
+                </select>
               </div>
+              <div>
+                <label
+                  class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Priority</label>
+                <select [(ngModel)]="newIssue.issuePriorityId"
+                  class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                  @for (priority of issuePriorities; track (priority.issuePriorityId || priority)) {
+                  <option [value]="priority.issuePriorityId || priority">{{ priority.issuePriorityName || priority }}
+                  </option>
+                  }
+                </select>
+              </div>
+            </div>
 
-              <!-- Issue Type & Priority -->
+            <!-- Description -->
+            <div>
+              <label
+                class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Description</label>
+              <textarea [(ngModel)]="newIssue.description" rows="3" placeholder="Provide more context and details..."
+                class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"></textarea>
+            </div>
+
+            <!-- People Section -->
+            <div class="border-t border-border pt-6">
+              <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                People
+              </h4>
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Issue Type</label>
-                  <select [(ngModel)]="newIssue.issueType"
-                          class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
-                    @for (type of issueTypes; track (type.issueTypeId || type)) {
-                      <option [value]="type.issueTypeId || type">{{ type.issueTypeName || type }}</option>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Assignee</label>
+                  <select [(ngModel)]="newIssue.assigneeId"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                    <option value="">Unassigned</option>
+                    @for (user of users; track user.user_id) {
+                    <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
                     }
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Priority</label>
-                  <select [(ngModel)]="newIssue.issuePriorityId"
-                          class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
-                    @for (priority of issuePriorities; track (priority.issuePriorityId || priority)) {
-                      <option [value]="priority.issuePriorityId || priority">{{ priority.issuePriorityName || priority }}</option>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Developer</label>
+                  <select [(ngModel)]="newIssue.developerId"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                    <option value="">Unassigned</option>
+                    @for (user of users; track user.user_id) {
+                    <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Tester</label>
+                  <select [(ngModel)]="newIssue.testerId"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                    <option value="">Unassigned</option>
+                    @for (user of users; track user.user_id) {
+                    <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Business Analyst</label>
+                  <select [(ngModel)]="newIssue.baId"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                    <option value="">Unassigned</option>
+                    @for (user of users; track user.user_id) {
+                    <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
                     }
                   </select>
                 </div>
               </div>
+            </div>
 
-              <!-- Description -->
-              <div>
-                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Description</label>
-                <textarea [(ngModel)]="newIssue.description" rows="3" 
-                          placeholder="Provide more context and details..."
-                          class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"></textarea>
-              </div>
-
-              <!-- People Section -->
-              <div class="border-t border-border pt-6">
-                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                  People
-                </h4>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Assignee</label>
-                    <select [(ngModel)]="newIssue.assigneeId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                      <option value="">Unassigned</option>
-                      @for (user of users; track user.user_id) {
-                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
-                      }
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Developer</label>
-                    <select [(ngModel)]="newIssue.developerId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                      <option value="">Unassigned</option>
-                      @for (user of users; track user.user_id) {
-                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
-                      }
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Tester</label>
-                    <select [(ngModel)]="newIssue.testerId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                      <option value="">Unassigned</option>
-                      @for (user of users; track user.user_id) {
-                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
-                      }
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Business Analyst</label>
-                    <select [(ngModel)]="newIssue.baId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                      <option value="">Unassigned</option>
-                      @for (user of users; track user.user_id) {
-                        <option [value]="user.user_id">{{ user.fullname }} ({{ user.username }})</option>
-                      }
-                    </select>
-                  </div>
+            <!-- Planning Section -->
+            <div class="border-t border-border pt-6">
+              <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Planning
+              </h4>
+              <div class="grid grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Sprint</label>
+                  <select [(ngModel)]="newIssue.sprintId"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                    <option value="">None</option>
+                    @for (sprint of sprints; track (sprint.sprintId || sprint.sprint_id)) {
+                    <option [value]="sprint.sprintId || sprint.sprint_id">{{ sprint.sprintName || sprint.sprint_name }}
+                    </option>
+                    }
+                  </select>
                 </div>
-              </div>
-
-              <!-- Planning Section -->
-              <div class="border-t border-border pt-6">
-                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  Planning
-                </h4>
-                <div class="grid grid-cols-3 gap-4">
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Sprint</label>
-                    <select [(ngModel)]="newIssue.sprintId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                      <option value="">None</option>
-                      @for (sprint of sprints; track (sprint.sprintId || sprint.sprint_id)) {
-                        <option [value]="sprint.sprintId || sprint.sprint_id">{{ sprint.sprintName || sprint.sprint_name }}</option>
-                      }
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Epic</label>
-                    <select [(ngModel)]="newIssue.epicId" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                      <option value="">None</option>
-                      @for (epic of epics; track epic.issue_id) {
-                        <option [value]="epic.issue_id">{{ epic.issue_name }} ({{ epic.issue_id }})</option>
-                      }
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Linked Issue</label>
-                    <select [(ngModel)]="newIssue.listIssues" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                      <option value="">Not linked</option>
-                      @for (issue of allProjectIssues; track issue.issue_id) {
-                        <option [value]="issue.issue_id">{{ issue.issue_id }} - {{ issue.issue_name }}</option>
-                      }
-                    </select>
-                  </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Epic</label>
+                  <select [(ngModel)]="newIssue.epicId"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                    <option value="">None</option>
+                    @for (epic of epics; track epic.issue_id) {
+                    <option [value]="epic.issue_id">{{ epic.issue_name }} ({{ epic.issue_id }})</option>
+                    }
+                  </select>
                 </div>
-              </div>
-
-              <!-- Rates & Estimates -->
-              <div class="border-t border-border pt-6">
-                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Rates & Estimates
-                </h4>
-                <div class="grid grid-cols-3 gap-4">
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Dev Rate (%)</label>
-                    <input type="number" [(ngModel)]="newIssue.issueDevRate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Est. Dev (h)</label>
-                    <input type="number" [(ngModel)]="newIssue.estimateDev" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Reopen Dev (h)</label>
-                    <input type="number" [(ngModel)]="newIssue.estimateReopenDev" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Test Rate (%)</label>
-                    <input type="number" [(ngModel)]="newIssue.issueTestRate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Est. Test (h)</label>
-                    <input type="number" [(ngModel)]="newIssue.estimateTest" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Reopen Test (h)</label>
-                    <input type="number" [(ngModel)]="newIssue.estimateReopenTest" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
-                  </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Linked Issue</label>
+                  <select [(ngModel)]="newIssue.listIssues"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                    <option value="">Not linked</option>
+                    @for (issue of allProjectIssues; track issue.issue_id) {
+                    <option [value]="issue.issue_id">{{ issue.issue_id }} - {{ issue.issue_name }}</option>
+                    }
+                  </select>
                 </div>
-              </div>
-
-              <!-- Dates Section -->
-              <div class="border-t border-border pt-6">
-                <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Dates
-                </h4>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Customer Request</label>
-                    <input type="datetime-local" [(ngModel)]="newIssue.cusRequestDate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">PM Request</label>
-                    <input type="datetime-local" [(ngModel)]="newIssue.pmRequestDate" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Deadline Dev</label>
-                    <input type="datetime-local" [(ngModel)]="newIssue.deadlineDev" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Deadline Test</label>
-                    <input type="datetime-local" [(ngModel)]="newIssue.deadlineTest" class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Attachments (Simple Input) -->
-              <div class="border-t border-border pt-6">
-                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Attachment ID</label>
-                <input type="text" [(ngModel)]="newIssue.issueAttachmentId" placeholder="Attachment reference..."
-                       class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
               </div>
             </div>
-          </div>
 
-          <div class="bg-gray-50 px-8 py-4 flex justify-end space-x-3">
-            <button (click)="closeCreateModal()" 
-                    class="px-4 py-2 text-sm font-bold text-text-secondary hover:bg-gray-200 rounded-lg transition-colors">
-              Cancel
-            </button>
-            <button (click)="saveNewIssue()" 
-                    [disabled]="!newIssue.issueName"
-                    [class.opacity-50]="!newIssue.issueName"
-                    class="px-6 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-md transition-all">
-              {{ isEditMode ? 'Save Changes' : 'Create' }}
-            </button>
+            <!-- Rates & Estimates -->
+            <div class="border-t border-border pt-6">
+              <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Rates & Estimates
+              </h4>
+              <div class="grid grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Dev Rate (%)</label>
+                  <input type="number" [(ngModel)]="newIssue.issueDevRate"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Est. Dev (h)</label>
+                  <input type="number" [(ngModel)]="newIssue.estimateDev"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Reopen Dev (h)</label>
+                  <input type="number" [(ngModel)]="newIssue.estimateReopenDev"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Test Rate (%)</label>
+                  <input type="number" [(ngModel)]="newIssue.issueTestRate"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Est. Test (h)</label>
+                  <input type="number" [(ngModel)]="newIssue.estimateTest"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Reopen Test (h)</label>
+                  <input type="number" [(ngModel)]="newIssue.estimateReopenTest"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+                </div>
+              </div>
+            </div>
+
+            <!-- Dates Section -->
+            <div class="border-t border-border pt-6">
+              <h4 class="text-sm font-bold text-text-primary mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Dates
+              </h4>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Customer Request</label>
+                  <input type="datetime-local" [(ngModel)]="newIssue.cusRequestDate"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">PM Request</label>
+                  <input type="datetime-local" [(ngModel)]="newIssue.pmRequestDate"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Deadline Dev</label>
+                  <input type="datetime-local" [(ngModel)]="newIssue.deadlineDev"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Deadline Test</label>
+                  <input type="datetime-local" [(ngModel)]="newIssue.deadlineTest"
+                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                </div>
+              </div>
+            </div>
+
+            <!-- Attachments (Simple Input) -->
+            <!-- <div class="border-t border-border pt-6">
+              <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Attachment
+                ID</label>
+              <input type="text" [(ngModel)]="newIssue.issueAttachmentId" placeholder="Attachment reference..."
+                class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary">
+            </div> -->
           </div>
+        </div>
+
+        <div class="bg-gray-50 px-8 py-4 flex justify-end space-x-3">
+          <button (click)="closeCreateModal()"
+            class="px-4 py-2 text-sm font-bold text-text-secondary hover:bg-gray-200 rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button (click)="saveNewIssue()" [disabled]="!newIssue.issueName" [class.opacity-50]="!newIssue.issueName"
+            class="px-6 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-md transition-all">
+            {{ isEditMode ? 'Save Changes' : 'Create' }}
+          </button>
         </div>
       </div>
     </div>
+  </div>
   }
 
   <!-- Create Sprint Modal -->
   @if (isCreateSprintModalOpen) {
-    <div class="fixed inset-0 z-[100] overflow-y-auto">
-      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true" (click)="closeCreateSprintModal()">
-          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
+  <div class="fixed inset-0 z-[100] overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true" (click)="closeCreateSprintModal()">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
 
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-border">
-          <div class="bg-white px-8 pt-6 pb-8">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-bold text-text-primary">{{ isEditSprintMode ? 'Edit Sprint' : 'Create Sprint' }}</h3>
-              <button (click)="closeCreateSprintModal()" class="text-text-secondary hover:text-text-primary transition-colors">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div class="space-y-6">
-              <div *ngIf ="isEditSprintMode">
-                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Sprint ID</label>
-                <input type="text" [value]="newSprint.sprintId" readonly
-                       class="w-full bg-gray-50 border border-border rounded-lg px-4 py-2.5 text-sm font-bold text-primary cursor-not-allowed">
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Sprint Name <span class="text-red-500">*</span></label>
-                <input type="text" [(ngModel)]="newSprint.sprintName" placeholder="e.g. Q2 Sprint 1"
-                       class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none">
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Start Date</label>
-                  <input type="datetime-local" [(ngModel)]="newSprint.startDate"
-                         class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">End Date</label>
-                  <input type="datetime-local" [(ngModel)]="newSprint.endDate"
-                         class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Status</label>
-                <select [(ngModel)]="newSprint.status" class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none bg-white">
-                  <option [ngValue]="true">Active</option>
-                  <option [ngValue]="false">Closed</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-gray-50 px-8 py-4 flex justify-end space-x-3">
-            <button (click)="closeCreateSprintModal()" class="px-4 py-2 text-sm font-bold text-text-secondary hover:bg-gray-200 rounded-lg">Cancel</button>
-            <button (click)="saveNewSprint()" [disabled]="!newSprint.sprintName"
-                    class="px-6 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-md disabled:opacity-50">
-              {{ isEditSprintMode ? 'Save Changes' : 'Create' }}
+      <div
+        class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-border">
+        <div class="bg-white px-8 pt-6 pb-8">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-text-primary">{{ isEditSprintMode ? 'Edit Sprint' : 'Create Sprint' }}
+            </h3>
+            <button (click)="closeCreateSprintModal()"
+              class="text-text-secondary hover:text-text-primary transition-colors">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
+
+          <div class="space-y-6">
+            <div *ngIf="isEditSprintMode">
+              <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Sprint ID</label>
+              <input type="text" [value]="newSprint.sprintId" readonly
+                class="w-full bg-gray-50 border border-border rounded-lg px-4 py-2.5 text-sm font-bold text-primary cursor-not-allowed">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Sprint Name <span
+                  class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="newSprint.sprintName" placeholder="e.g. Q2 Sprint 1"
+                class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Start
+                  Date</label>
+                <input type="datetime-local" [(ngModel)]="newSprint.startDate"
+                  class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">End
+                  Date</label>
+                <input type="datetime-local" [(ngModel)]="newSprint.endDate"
+                  class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Status</label>
+              <select [(ngModel)]="newSprint.status"
+                class="w-full border border-border rounded-lg px-4 py-2.5 text-sm focus:border-primary outline-none bg-white">
+                <option [ngValue]="true">Active</option>
+                <option [ngValue]="false">Closed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 px-8 py-4 flex justify-end space-x-3">
+          <button (click)="closeCreateSprintModal()"
+            class="px-4 py-2 text-sm font-bold text-text-secondary hover:bg-gray-200 rounded-lg">Cancel</button>
+          <button (click)="saveNewSprint()" [disabled]="!newSprint.sprintName"
+            class="px-6 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-md disabled:opacity-50">
+            {{ isEditSprintMode ? 'Save Changes' : 'Create' }}
+          </button>
         </div>
       </div>
     </div>
+  </div>
   }
 </div>
