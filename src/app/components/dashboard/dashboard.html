@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#fafbfc] min-h-screen">
+﻿<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#fafbfc] min-h-screen">
   <!-- Header Section -->
   <div class="mb-6 flex justify-between items-center">
     <div>
@@ -6,98 +6,188 @@
         <span class="hover:underline cursor-pointer">Dashboards</span>
         <span>/</span>
       </nav>
-      <h1 class="text-2xl font-semibold text-[#172b4d]">System Dashboard</h1>
+      <h1 class="text-2xl font-semibold text-[#172b4d]">Quản lý Dashboard</h1>
     </div>
     <div class="flex space-x-2">
-      <button class="bg-[#f4f5f7] border border-transparent hover:bg-[#ebecf0] px-3 py-1.5 rounded text-sm font-medium text-[#42526e] transition-colors flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+      <button (click)="openManageModal()"
+        class="bg-[#f4f5f7] border border-[#dfe1e6] hover:bg-[#ebecf0] px-3 py-1.5 rounded text-sm font-medium text-[#42526e] transition-colors flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
         </svg>
-        Edit layout
+        Chỉnh sửa bộ lọc
       </button>
-      <button class="bg-[#0052cc] text-white hover:bg-[#0047b3] px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button (click)="openManageModal(); openAddFilter()"
+        class="bg-[#0052cc] text-white hover:bg-[#0047b3] px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Add gadget
+        Thêm bộ lọc
       </button>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-    
+
     <!-- LEFT COLUMN (Span 2) -->
     <div class="md:col-span-2 space-y-6">
-      
+
       <div *ngIf="isLoading" class="flex justify-center p-8">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0052cc]"></div>
       </div>
 
       <ng-container *ngIf="!isLoading">
         @for (filter of dynamicFilters; track filter.filterId) {
-          <!-- Dynamic Gadget -->
-          <div class="bg-white rounded border border-[#dfe1e6] shadow-sm">
-            <div class="bg-[#f4f5f7] border-b border-[#dfe1e6] px-4 py-2.5 flex justify-between items-center rounded-t">
-              <h3 class="font-semibold text-[#42526e] text-sm">Filter Results: {{ filter.filterId }}</h3>
-              <div class="flex space-x-1">
-                <button class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e]"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button>
-                <button class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e]"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg></button>
-              </div>
-            </div>
-            
-            <div *ngIf="filter.error" class="p-4 text-red-500 text-sm">
-              {{ filter.error }}
-            </div>
+        <!-- Dynamic Gadget -->
+        <div class="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+          <div class="bg-gray-100 border-b border-border px-6 py-3 flex justify-between items-center">
+            <h3 class="font-extrabold text-text-primary text-xs uppercase tracking-widest">Bộ lọc: {{
+              filter.filterId }}</h3>
+            <div class="flex space-x-1">
+              <!-- Filter Toggle Button -->
+              <button (click)="toggleFilters(filter.filterId)" [class.bg-[#0052cc]]="filterState[filter.filterId]?.show"
+                [class.text-white]="filterState[filter.filterId]?.show"
+                class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e] transition-colors" title="Toggle Filters">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+              </button>
 
-            <div *ngIf="!filter.error" class="p-0 overflow-x-auto">
-              <table class="w-full text-left text-sm border-collapse">
-                <thead>
-                  <tr>
-                    <th class="border-b border-[#dfe1e6] text-[#5e6c84] text-xs font-semibold px-4 py-2 w-10">T</th>
-                    <th class="border-b border-[#dfe1e6] text-[#5e6c84] text-xs font-semibold px-4 py-2">Key</th>
-                    <th class="border-b border-[#dfe1e6] text-[#5e6c84] text-xs font-semibold px-4 py-2">Summary</th>
-                    <th class="border-b border-[#dfe1e6] text-[#5e6c84] text-xs font-semibold px-4 py-2 w-10">P</th>
-                    <th class="border-b border-[#dfe1e6] text-[#5e6c84] text-xs font-semibold px-4 py-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (issue of filter.issues; track issue.issue_id || issue.key || $index) {
-                    <tr class="hover:bg-[#fafbfc] border-b border-[#dfe1e6] last:border-b-0 group">
-                      <td class="px-4 py-2">
-                        <!-- Default task icon -->
-                        <div [ngClass]="{'bg-[#e5493a]': issue.issue_type === 'BUG', 'bg-[#57d9a3]': issue.issue_type === 'STORY', 'bg-[#4bade8]': issue.issue_type !== 'BUG' && issue.issue_type !== 'STORY'}" class="w-4 h-4 rounded-sm flex items-center justify-center text-white text-[10px]">
-                          <span *ngIf="issue.issue_type === 'BUG'">•</span>
-                          <span *ngIf="issue.issue_type === 'STORY'">★</span>
-                          <span *ngIf="issue.issue_type !== 'BUG' && issue.issue_type !== 'STORY'">✓</span>
-                        </div>
-                      </td>
-                      <td class="px-4 py-2 whitespace-nowrap"><span class="text-[#0052cc] hover:underline cursor-pointer">{{ issue.issue_id || issue.key }}</span></td>
-                      <td class="px-4 py-2 text-[#172b4d] max-w-[300px] truncate" [title]="issue.issue_name || issue.summary">{{ issue.issue_name || issue.summary }}</td>
-                      <td class="px-4 py-2">
-                        <span *ngIf="issue.issue_priority_id === 'HIGH' || issue.issue_priority_id === 'HIGHEST'" class="text-[#de350b] font-bold" title="High">↑</span>
-                        <span *ngIf="issue.issue_priority_id === 'MEDIUM'" class="text-[#ff991f] font-bold" title="Medium">=</span>
-                        <span *ngIf="issue.issue_priority_id === 'LOW'" class="text-[#0052cc] font-bold" title="Low">↓</span>
-                        <span *ngIf="!issue.issue_priority_id" class="text-[#5e6c84] font-bold" title="None">-</span>
-                      </td>
-                      <td class="px-4 py-2 whitespace-nowrap">
-                        <span class="bg-[#dfe1e6] text-[#42526e] text-[11px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">{{ issue.issue_status || issue.status || 'OPEN' }}</span>
-                      </td>
-                    </tr>
-                  }
-                  <tr *ngIf="!filter.issues || filter.issues.length === 0">
-                    <td colspan="5" class="px-4 py-4 text-center text-[#5e6c84] text-sm italic">No issues found for this filter.</td>
-                  </tr>
-                </tbody>
-              </table>
+              <!-- Clear Filter Button -->
+              <button *ngIf="hasActiveFilters(filter.filterId)" (click)="clearFilters(filter.filterId)"
+                class="p-1 hover:bg-red-50 rounded text-red-500 transition-colors" title="Clear Filters">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <!-- Collapse/Expand Button -->
+              <button (click)="toggleCollapse(filter.filterId)"
+                class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e] transition-colors" title="Toggle Collapse">
+                <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="filterState[filter.filterId]?.collapsed"
+                  class="h-4 w-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             </div>
           </div>
+
+          <div *ngIf="filter.error" class="p-4 text-red-500 text-sm">
+            {{ filter.error }}
+          </div>
+
+          <div *ngIf="!filter.error && !filterState[filter.filterId]?.collapsed"
+            class="p-0 overflow-x-auto animate-in fade-in slide-in-from-top-1 duration-200">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="bg-gray-50/50 border-b border-border">
+                  <th
+                    class="px-6 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-wider w-10 text-center">
+                    T</th>
+                  <th class="px-6 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-wider">Mã việc</th>
+                  <th class="px-6 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-wider">Tiêu đề</th>
+                  <th
+                    class="px-6 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-wider w-10 text-center">
+                    P</th>
+                  <th class="px-6 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-wider">Trạng thái
+                  </th>
+                </tr>
+                <!-- Filter Input Row -->
+                <tr *ngIf="filterState[filter.filterId]?.show"
+                  class="bg-white animate-in slide-in-from-top-1 duration-200">
+                  <th class="border-b border-border px-3 py-2">
+                    <input type="text" [(ngModel)]="filterState[filter.filterId].values['type']" placeholder="Type..."
+                      class="w-full text-[11px] px-2 py-1.5 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                  </th>
+                  <th class="border-b border-border px-3 py-2">
+                    <input type="text" [(ngModel)]="filterState[filter.filterId].values['key']" placeholder="Key..."
+                      class="w-full text-[11px] px-2 py-1.5 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                  </th>
+                  <th class="border-b border-border px-3 py-2">
+                    <input type="text" [(ngModel)]="filterState[filter.filterId].values['summary']"
+                      placeholder="Summary..."
+                      class="w-full text-[11px] px-2 py-1.5 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                  </th>
+                  <th class="border-b border-border px-3 py-2">
+                    <input type="text" [(ngModel)]="filterState[filter.filterId].values['priority']"
+                      placeholder="Prio..."
+                      class="w-full text-[11px] px-2 py-1.5 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                  </th>
+                  <th class="border-b border-border px-3 py-2">
+                    <input type="text" [(ngModel)]="filterState[filter.filterId].values['status']"
+                      placeholder="Status..."
+                      class="w-full text-[11px] px-2 py-1.5 border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-border">
+                @for (issue of getFilteredIssues(filter); track issue.issue_id || issue.key || $index) {
+                <tr class="hover:bg-gray-50/50 transition-colors group">
+                  <td class="px-6 py-4 text-center">
+                    <div
+                      [ngClass]="{'bg-[#e5493a]': (issue.issue_type || '').includes('BUG'), 'bg-[#57d9a3]': issue.issue_type === 'STORY', 'bg-[#4bade8]': !(issue.issue_type || '').includes('BUG') && issue.issue_type !== 'STORY'}"
+                      class="w-4 h-4 rounded-sm flex items-center justify-center text-white text-[10px] mx-auto shadow-sm">
+                      <span *ngIf="(issue.issue_type || '').includes('BUG')">?</span>
+                      <span *ngIf="issue.issue_type === 'STORY'">?</span>
+                      <span *ngIf="!(issue.issue_type || '').includes('BUG') && issue.issue_type !== 'STORY'">?</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">
+                    <span class="text-primary hover:underline cursor-pointer"
+                      (click)="goToIssue(issue.project_id || issue.projectId, issue.issue_id || issue.key)">
+                      {{ issue.issue_id || issue.key }}
+                    </span>
+                  </td>
+                  <td
+                    class="px-6 py-4 text-sm text-text-primary max-w-[300px] truncate cursor-pointer hover:text-primary transition-colors"
+                    (click)="goToIssue(issue.project_id || issue.projectId, issue.issue_id || issue.key)"
+                    [title]="issue.issue_name || issue.summary">
+                    {{ issue.issue_name || issue.summary }}
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span *ngIf="issue.issue_priority_id === 'HIGH' || issue.issue_priority_id === 'HIGHEST'"
+                      class="text-red-600 font-bold" title="High">↑</span>
+                    <span *ngIf="issue.issue_priority_id === 'MEDIUM'" class="text-orange-500 font-bold"
+                      title="Medium">=</span>
+                    <span *ngIf="issue.issue_priority_id === 'LOW'" class="text-primary font-bold" title="Low">↓</span>
+                    <span *ngIf="!issue.issue_priority_id" class="text-text-secondary font-bold" title="None">-</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="bg-gray-100 text-text-secondary text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wide border border-border">{{
+                      issue.issue_status || issue.status || 'OPEN' }}</span>
+                  </td>
+                </tr>
+                }
+                <tr *ngIf="getFilteredIssues(filter).length === 0">
+                  <td colspan="5" class="px-6 py-10 text-center text-text-secondary text-sm italic">No issues match your
+                    filters.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
         }
-        
-        <div *ngIf="dynamicFilters.length === 0" class="text-center py-10 bg-white border border-[#dfe1e6] rounded shadow-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-[#dfe1e6] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          <p class="text-[#5e6c84] font-medium">You don't have any filters configured.</p>
+
+        <div *ngIf="dynamicFilters.length === 0"
+          class="text-center py-16 bg-white border border-[#dfe1e6] rounded shadow-sm">
+          <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#dfe1e6]" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+          </div>
+          <p class="text-[#5e6c84] font-medium mb-1">You don't have any filters configured.</p>
+          <p class="text-[#5e6c84] text-sm mb-4 opacity-75">Click "Add filter" to customize your dashboard.</p>
+          <button (click)="openManageModal(); openAddFilter()"
+            class="text-[#0052cc] text-sm font-bold hover:underline">Add your first filter</button>
         </div>
       </ng-container>
     </div>
@@ -106,15 +196,22 @@
     <div class="space-y-6">
 
       <!-- Gadget: Projects -->
-      <div class="bg-white rounded border border-[#dfe1e6] shadow-sm">
-        <div class="bg-[#f4f5f7] border-b border-[#dfe1e6] px-4 py-2.5 flex justify-between items-center rounded-t">
-          <h3 class="font-semibold text-[#42526e] text-sm">Projects</h3>
+      <div class="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+        <div class="bg-gray-100 border-b border-border px-6 py-3 flex justify-between items-center">
+          <h3 class="font-extrabold text-text-primary text-xs uppercase tracking-widest">Projects</h3>
           <div class="flex space-x-1">
-            <button class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e]"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button>
-            <button class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e]"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg></button>
+            <button class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e]"><svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg></button>
+            <button class="p-1 hover:bg-[#ebecf0] rounded text-[#42526e]"><svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+              </svg></button>
           </div>
         </div>
-        
+
         <div *ngIf="isLoading" class="flex justify-center p-4">
           <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0052cc]"></div>
         </div>
@@ -122,21 +219,187 @@
         <div *ngIf="!isLoading" class="p-4">
           <div class="space-y-4">
             @for (p of projects; track p.key) {
-              <div class="flex items-center space-x-3 cursor-pointer group">
-                <img [src]="getAvatar(p.name)" alt="Project Avatar" class="w-8 h-8 rounded-sm">
-                <div>
-                  <p class="text-[13px] text-[#0052cc] group-hover:underline font-medium">{{ p.name }}</p>
-                  <p class="text-[11px] text-[#5e6c84]">Lead: {{ p.lead || 'Unassigned' }}</p>
-                </div>
+            <div class="flex items-center space-x-3 cursor-pointer group" (click)="goToProject(p.key)">
+              <img [src]="getAvatar(p.name)" alt="Project Avatar"
+                class="w-10 h-10 rounded-lg shadow-sm border border-border group-hover:border-primary transition-all">
+              <div>
+                <p class="text-sm text-primary group-hover:underline font-bold">{{ p.name }}</p>
+                <p class="text-[11px] text-text-secondary opacity-80">Lead: {{ p.lead || 'Unassigned' }}</p>
               </div>
+            </div>
             }
-            <div *ngIf="projects.length === 0" class="text-center py-2 text-[#5e6c84] text-xs">
+            <div *ngIf="projects.length === 0"
+              class="text-center py-4 text-[#5e6c84] text-xs italic bg-gray-50 rounded">
               No projects found.
             </div>
           </div>
         </div>
       </div>
-      
+
+    </div>
+  </div>
+</div>
+
+<!-- Manage Filters Modal (Edit Layout) -->
+<div *ngIf="isManageModalOpen" class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" (click)="closeManageModal()"></div>
+
+  <div class="flex items-center justify-center min-h-screen p-4 text-center">
+    <div
+      class="inline-block align-middle bg-white rounded-xl text-left shadow-2xl transform transition-all w-full max-w-4xl max-h-[90vh] border border-[#dfe1e6] flex flex-col relative z-50">
+      <div class="bg-white px-6 py-4 border-b border-[#dfe1e6] rounded-t-xl flex justify-between items-center shrink-0">
+        <h3 class="text-xl font-bold text-[#172b4d]" id="modal-title">
+          Quản lý bộ lọc cá nhân
+        </h3>
+        <button (click)="closeManageModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex-grow overflow-hidden flex flex-col md:flex-row">
+        <!-- List Sidebar -->
+        <div class="w-full md:w-1/3 border-r border-[#dfe1e6] bg-gray-50/50 overflow-y-auto p-4 shrink-0 min-h-[300px]">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="text-xs font-bold text-[#5e6c84] uppercase tracking-wider">Bộ lọc cá nhân</h4>
+            <button (click)="openAddFilter()"
+              class="text-[#0052cc] text-xs font-bold hover:underline flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Tạo bộ lọc
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <div *ngIf="myFilters.length === 0" class="text-center py-8 text-[#5e6c84] text-sm italic">
+              Bạn chưa tạo bộ lọc cá nhân
+            </div>
+            <div *ngFor="let filter of myFilters" (click)="editFilter(filter)"
+              [class.bg-blue-50]="currentFilter.filterId === filter.filterId"
+              [class.border-blue-200]="currentFilter.filterId === filter.filterId"
+              class="p-3 rounded-lg border border-transparent hover:border-[#dfe1e6] hover:bg-white cursor-pointer transition-all group">
+              <div class="flex justify-between items-start">
+                <div class="max-w-[80%]">
+                  <p class="text-sm font-bold text-[#172b4d] truncate">{{ filter.filterId }}</p>
+                  <p class="text-[10px] text-[#5e6c84] mt-0.5 truncate font-mono">{{ filter.strSql }}</p>
+                </div>
+                <button (click)="$event.stopPropagation(); deleteFilter(filter.filterId!)"
+                  class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-all opacity-0 group-hover:opacity-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="w-full md:w-2/3 p-6 overflow-y-auto bg-white">
+          <div *ngIf="!currentFilter.actionType"
+            class="h-full flex flex-col items-center justify-center text-center p-10 opacity-60">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-[#dfe1e6] mb-4" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <p class="text-[#5e6c84] font-medium">Select a filter to edit or create a new one.</p>
+          </div>
+
+          <div *ngIf="currentFilter.actionType" class="animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <h4 class="text-sm font-bold text-[#172b4d] mb-6 uppercase tracking-wider border-b border-[#dfe1e6] pb-2">
+              {{ isEditFilterMode ? 'Edit Filter' : 'Create New Filter' }}
+            </h4>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-xs font-bold text-[#5e6c84] mb-2 uppercase tracking-wider">Filter ID
+                  (Title)</label>
+                <input type="text" [(ngModel)]="currentFilter.filterId" [disabled]="isEditFilterMode"
+                  placeholder="e.g. My Open Issues"
+                  class="w-full px-4 py-2.5 rounded-lg border border-[#dfe1e6] focus:ring-2 focus:ring-[#0052cc]/20 focus:border-[#0052cc] outline-none transition-all text-sm font-medium disabled:bg-gray-100 disabled:text-gray-500">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-[#5e6c84] mb-2 uppercase tracking-wider">SQL Query</label>
+                <div class="relative group">
+                  <textarea [(ngModel)]="currentFilter.strSql" rows="8"
+                    placeholder="SELECT * FROM issues WHERE assignee_id = @UserId AND issue_status != 'DONE'"
+                    class="w-full px-4 py-3 rounded-lg border border-[#dfe1e6] focus:ring-2 focus:ring-[#0052cc]/20 focus:border-[#0052cc] outline-none transition-all text-sm font-mono leading-relaxed resize-none"></textarea>
+                  <div
+                    class="absolute right-3 bottom-3 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Tip: Use @UserId for current user
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end space-x-3 pt-4">
+                <button (click)="currentFilter = {}"
+                  class="px-5 py-2 text-sm font-bold text-[#42526e] hover:bg-gray-100 rounded-lg transition-colors">
+                  Cancel
+                </button>
+                <button (click)="saveFilter()" [disabled]="isSaving"
+                  class="bg-[#0052cc] text-white hover:bg-[#0047b3] px-8 py-2 rounded-lg text-sm font-bold transition-all shadow-md disabled:opacity-50 flex items-center">
+                  <span *ngIf="isSaving"
+                    class="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                  {{ isSaving ? 'Saving...' : (isEditFilterMode ? 'Update' : 'Create Filter') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="isDeleteModalOpen" class="fixed inset-0 z-[110] overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div (click)="isDeleteModalOpen = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
+      aria-hidden="true"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div
+      class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-[#dfe1e6]">
+      <div class="bg-white px-6 pt-5 pb-4 sm:p-8 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3 class="text-lg leading-6 font-bold text-[#172b4d]" id="modal-title">
+              Xác nhận xóa bộ lọc
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-[#5e6c84]">
+                Bạn có chắc chắn muốn xóa bộ lọc <strong>{{ deleteFilterId }}</strong> không? Hành động này không thể
+                hoàn tác.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-6 py-4 sm:px-8 sm:flex sm:flex-row-reverse gap-3">
+        <button type="button" (click)="confirmDeleteFilter()"
+          class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2 bg-red-600 text-sm font-bold text-white hover:bg-red-700 focus:outline-none sm:w-auto transition-all">
+          Xác nhận xóa
+        </button>
+        <button type="button" (click)="isDeleteModalOpen = false"
+          class="mt-3 w-full inline-flex justify-center rounded-lg border border-[#dfe1e6] shadow-sm px-5 py-2 bg-white text-sm font-bold text-[#42526e] hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto transition-all">
+          Hủy bỏ
+        </button>
+      </div>
     </div>
   </div>
 </div>

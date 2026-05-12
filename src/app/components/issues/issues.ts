@@ -36,6 +36,13 @@ export class IssuesComponent implements OnInit, OnDestroy {
   isCreateSprintModalOpen = false;
   isEditMode = false;
   isEditSprintMode = false;
+  
+  // Delete Modal
+  isDeleteModalOpen = false;
+  deleteType: 'comment' | 'attachment' | 'sprint' | null = null;
+  deleteTargetId: any = null;
+  deleteModalTitle = '';
+  deleteModalMessage = '';
   issueTypes: any[] = [];
   issuePriorities: any[] = [];
   users: any[] = [];
@@ -55,6 +62,14 @@ export class IssuesComponent implements OnInit, OnDestroy {
   // Editor states
   isEditingDescription = false;
   editingCommentId: number | null = null;
+
+  // Linked Issue Multi-select
+  linkedIssueSearch: string = '';
+  isLinkedIssueDropdownOpen: boolean = false;
+
+  // Section Visibility
+  isAttachmentsExpanded = true;
+  isLinkedIssuesExpanded = true;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -277,6 +292,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
       switchMap((issuesRes: any) => {
         if (issuesRes.success && issuesRes.data) {
           this.issues = issuesRes.data.issues || [];
+          this.allProjectIssues = [...this.issues];
 
           // Determine which issue to load details for
           const targetId = (issueIdFromRoute && issueIdFromRoute !== 'all')
@@ -300,6 +316,10 @@ export class IssuesComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           if (res.success && res.data) {
             this.updateSelectedIssueData(res.data);
+            // Ensure modal data (like users, epics, allProjectIssues) is loaded
+            if (this.project?.projectId) {
+              this.loadModalData(this.project.projectId);
+            }
           }
           this.loading = false;
           this.cdr.detectChanges();
@@ -475,9 +495,45 @@ export class IssuesComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Refactored delete methods using custom modal
   deleteComment(commentId: number) {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
+    this.deleteType = 'comment';
+    this.deleteTargetId = commentId;
+    this.deleteModalTitle = 'Xóa Bình luận';
+    this.deleteModalMessage = 'Bạn có chắc chắn muốn xóa bình luận này không? Hành động này không thể hoàn tác.';
+    this.isDeleteModalOpen = true;
+    this.cdr.detectChanges();
+  }
 
+  deleteAttachment(attachmentId: number) {
+    this.deleteType = 'attachment';
+    this.deleteTargetId = attachmentId;
+    this.deleteModalTitle = 'Xóa Tệp đính kèm';
+    this.deleteModalMessage = 'Bạn có chắc chắn muốn xóa tệp đính kèm này không?';
+    this.isDeleteModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteType = null;
+    this.deleteTargetId = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete() {
+    if (!this.deleteType || this.deleteTargetId === null) return;
+
+    if (this.deleteType === 'comment') {
+      this.executeDeleteComment(this.deleteTargetId);
+    } else if (this.deleteType === 'attachment') {
+      this.executeDeleteAttachment(this.deleteTargetId);
+    } else if (this.deleteType === 'sprint') {
+      this.executeDeleteSprint(this.deleteTargetId);
+    }
+  }
+
+  private executeDeleteComment(commentId: number) {
     this.loading = true;
     this.issueService.deleteComment(commentId).subscribe(res => {
       this.zone.run(() => {
@@ -485,6 +541,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
         if (res.success) {
           this.notificationService.success('Comment deleted');
           this.comments = this.comments.filter(c => (c.issueCommentId || c.issue_comment_id) !== commentId);
+          this.closeDeleteModal();
         } else {
           this.notificationService.error('Failed to delete comment');
         }
@@ -499,9 +556,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteAttachment(attachmentId: number) {
-    if (!confirm('Are you sure you want to delete this attachment?')) return;
-
+  private executeDeleteAttachment(attachmentId: number) {
     this.loading = true;
     this.issueService.deleteAttachment(attachmentId).subscribe(res => {
       this.zone.run(() => {
@@ -509,6 +564,7 @@ export class IssuesComponent implements OnInit, OnDestroy {
         if (res.success) {
           this.notificationService.success('Attachment deleted');
           this.attachments = this.attachments.filter(a => (a.issueAttachmentId || a.issue_attachment_id) !== attachmentId);
+          this.closeDeleteModal();
         } else {
           this.notificationService.error('Failed to delete attachment');
         }
@@ -945,20 +1001,95 @@ export class IssuesComponent implements OnInit, OnDestroy {
   }
 
   deleteSprint(sprintId: string) {
+    this.deleteType = 'sprint';
+    this.deleteTargetId = sprintId;
+    this.deleteModalTitle = 'Xóa Sprint';
+    this.deleteModalMessage = 'Bạn có chắc chắn muốn xóa Sprint này không? Các công việc trong Sprint sẽ được chuyển về Backlog.';
+    this.isDeleteModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  private executeDeleteSprint(sprintId: string) {
     const projectId = this.project?.projectId || this.route.snapshot.paramMap.get('projectId');
     if (!projectId) return;
 
-    if (confirm('Are you sure you want to delete this sprint?')) {
-      this.sprintService.deleteSprint(sprintId, projectId).subscribe(res => {
-        this.zone.run(() => {
-          if (res.success) {
-            this.notificationService.success('Sprint deleted successfully');
-            this.loadSprints(projectId);
-          } else {
-            this.notificationService.error('Error deleting sprint: ' + res.message);
-          }
-        });
+    this.loading = true;
+    this.sprintService.deleteSprint(sprintId, projectId).subscribe(res => {
+      this.zone.run(() => {
+        this.loading = false;
+        if (res.success) {
+          this.notificationService.success('Sprint deleted successfully');
+          this.loadSprints(projectId);
+          this.closeDeleteModal();
+        } else {
+          this.notificationService.error('Error deleting sprint: ' + res.message);
+        }
+        this.cdr.detectChanges();
       });
+    }, () => {
+      this.zone.run(() => {
+        this.loading = false;
+        this.notificationService.error('An error occurred while deleting the sprint');
+        this.cdr.detectChanges();
+      });
+    });
+  }
+
+  // Linked Issue Helpers
+  get filteredLinkedIssues() {
+    const term = this.linkedIssueSearch.toLowerCase();
+    return this.allProjectIssues.filter(issue => 
+      issue.issue_id?.toLowerCase().includes(term) || 
+      issue.issue_name?.toLowerCase().includes(term)
+    );
+  }
+
+  toggleLinkedIssue(issueId: string) {
+    let currentLinks = (this.newIssue.listIssues || '').split(',').filter((id: string) => id.trim() !== '');
+    const index = currentLinks.indexOf(issueId);
+    
+    if (index === -1) {
+      currentLinks.push(issueId);
+    } else {
+      currentLinks.splice(index, 1);
     }
+    
+    this.newIssue.listIssues = currentLinks.join(',');
+    this.cdr.detectChanges();
+  }
+
+  isIssueLinked(issueId: string): boolean {
+    const currentLinks = (this.newIssue.listIssues || '').split(',').filter((id: string) => id.trim() !== '');
+    return currentLinks.includes(issueId);
+  }
+
+  removeLinkedIssue(issueId: string) {
+    let currentLinks = (this.newIssue.listIssues || '').split(',').filter((id: string) => id.trim() !== '');
+    currentLinks = currentLinks.filter((id: string) => id !== issueId);
+    this.newIssue.listIssues = currentLinks.join(',');
+    this.cdr.detectChanges();
+  }
+
+  get linkedIssueIds(): string[] {
+    return (this.newIssue.listIssues || '').split(',').filter((id: string) => id.trim() !== '');
+  }
+
+  get selectedIssueLinkedDetails(): any[] {
+    const issue = this.selectedIssue;
+    if (!issue) return [];
+    
+    const listStr = issue.listIssues || issue.list_issues || '';
+    if (!listStr || typeof listStr !== 'string') return [];
+    
+    const linkIds = listStr.split(',').map(id => id.trim()).filter(id => id !== '');
+    if (linkIds.length === 0) return [];
+    
+    // Use allProjectIssues as primary source, fallback to issues
+    const source = this.allProjectIssues.length > 0 ? this.allProjectIssues : this.issues;
+    
+    return source.filter(i => {
+      const id = i.issueId || i.issue_id;
+      return id && linkIds.includes(id);
+    });
   }
 }

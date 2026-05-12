@@ -7,6 +7,7 @@ import { AdminComponent } from './components/admin/admin';
 import { AccountManagementComponent } from './components/admin/account-management/account-management';
 import { ProjectManagementComponent } from './components/admin/project-management/project-management';
 import { WorkflowManagementComponent } from './components/admin/workflow-management/workflow-management';
+import { FilterManagementComponent } from './components/admin/filter-management/filter-management';
 import { IssuesComponent } from './components/issues/issues';
 import { ProjectsComponent } from './components/projects/projects';
 import { ProjectStatisticsComponent } from './components/projects/project-statistics/project-statistics';
@@ -47,6 +48,7 @@ export const routes: Routes = [
       { path: 'accounts', component: AccountManagementComponent },
       { path: 'projects', component: ProjectManagementComponent },
       { path: 'workflow', component: WorkflowManagementComponent },
+      { path: 'filters', component: FilterManagementComponent },
       { path: '', redirectTo: 'accounts', pathMatch: 'full' }
     ]
   },

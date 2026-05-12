@@ -47,4 +47,12 @@ export class ProjectsService {
   updateIssue(issueId: string, formData: FormData): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(`/api/issues/${issueId}`, formData);
   }
+
+  getAssignableUsers(projectId: string): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/assignable-users?projectId=${projectId}`);
+  }
+
+  assignUsersToProject(projectId: string, userIds: string[]): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.apiUrl}/${projectId}/assign-users`, userIds);
+  }
 }

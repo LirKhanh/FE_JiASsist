@@ -14,6 +14,7 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
   showMenu = false;
+  currentUser: any = null;
 
   constructor(
     private router: Router,
@@ -23,8 +24,13 @@ export class AppComponent {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       // Hide menu on login and register pages, show on other pages
+
       const currentUrl = event.urlAfterRedirects;
       this.showMenu = !currentUrl.includes('/login') && !currentUrl.includes('/register');
+      if (this.showMenu) {
+        this.currentUser = this.authService.getUser();
+
+      }
     });
   }
 

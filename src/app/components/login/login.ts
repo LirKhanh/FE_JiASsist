@@ -34,8 +34,9 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       this.loading = true;
+      const formValue = { ...this.loginForm.value, username: this.loginForm.value.username.toUpperCase() };
 
-      this.authService.login(this.loginForm.value)
+      this.authService.login(formValue)
         .pipe(
           finalize(() => {
             this.loading = false;

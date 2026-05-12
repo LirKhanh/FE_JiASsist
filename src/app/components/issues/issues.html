@@ -12,7 +12,7 @@
     <!-- Navigation Tabs -->
     <div class="flex items-center space-x-1 mr-4 border-r border-border pr-4">
       <button (click)="switchTab('issues')" title="Issues" [class.bg-secondary]="mainTab === 'issues'"
-        [class.text-primary]="mainTab === 'issues'" [class.border-primary/20]="mainTab === 'issues'"
+        [class.text-primary]="mainTab === 'issues'" [class.border-primary-20]="mainTab === 'issues'"
         class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors font-bold text-sm border border-transparent hover:bg-gray-100">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -63,17 +63,17 @@
     <div class="flex items-center space-x-2">
       <select
         class="bg-gray-50 border border-border px-3 py-2 rounded-lg text-sm font-medium text-text-primary focus:border-primary outline-none">
-        <option>All Statuses</option>
-        <option>Open</option>
-        <option>In Progress</option>
-        <option>Resolved</option>
+        <option>Trạng thái</option>
+        <option>Mở</option>
+        <option>Đang thực hiện</option>
+        <option>Đã giải quyết</option>
       </select>
     </div>
     <div class="flex-grow"></div>
     <div class="flex items-center space-x-3">
       <button (click)="openCreateModal()"
         class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all">
-        Create Issue
+        Tạo Issue
       </button>
     </div>
   </div>
@@ -120,7 +120,7 @@
         }
         @if (filteredIssues.length === 0) {
         <div class="p-4 text-center text-text-secondary text-xs italic">
-          {{ searchTerm ? 'No matches found.' : 'No issues found.' }}
+          {{ searchTerm ? 'Không tìm thấy Issue nào' : 'Không tìm thấy Issue nào' }}
         </div>
         }
       </div>
@@ -203,11 +203,11 @@
 
         <!-- Additional Info Grid (All non-null fields except People/Dates/Desc) -->
         <div class="mb-10 bg-gray-50/50 rounded-xl border border-border p-6">
-          <h3 class="text-sm font-bold text-text-primary mb-4 border-b border-border pb-2">Issue Information</h3>
+          <h3 class="text-sm font-bold text-text-primary mb-4 border-b border-border pb-2">Thông tin Issue</h3>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
             @if (selectedIssue.issueType) {
             <div>
-              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Type</label>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Loại</label>
               <span class="text-sm font-medium text-text-primary">{{ selectedIssue.issueType }}</span>
             </div>
             }
@@ -263,7 +263,7 @@
             }
             @if (selectedIssue.projectId) {
             <div>
-              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Project Code</label>
+              <label class="text-[10px] font-bold text-text-secondary uppercase block mb-1">Mã dự án</label>
               <span class="text-sm font-medium text-text-primary">{{ selectedIssue.projectId }}</span>
             </div>
             }
@@ -273,10 +273,10 @@
         <!-- Description Section -->
         <div class="mb-10 group/desc">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-bold text-text-primary">Description</h3>
+            <h3 class="text-sm font-bold text-text-primary">Mô tả</h3>
             <button *ngIf="!isEditingDescription" (click)="isEditingDescription = true"
               class="text-xs text-primary font-medium hover:underline opacity-0 group-hover/desc:opacity-100 transition-opacity">
-              Edit
+              Sửa
             </button>
           </div>
 
@@ -293,56 +293,122 @@
 
         @if (attachments.length > 0) {
         <div class="mb-10">
-          <h3 class="text-sm font-bold text-text-primary mb-4">Attachments ({{ attachments.length }})</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @for (attr of attachments; track attr.issueAttachmentId) {
-            <div
-              class="flex flex-col border border-border rounded-lg overflow-hidden hover:shadow-md transition-all group">
-              <!-- Preview Area -->
-              <div class="h-32 bg-gray-50 flex items-center justify-center overflow-hidden relative">
-                @if (isImage(attr.fileName)) {
-                <img [src]="'https://localhost:44367/' + attr.filePath"
-                  class="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Attachment">
-                } @else {
-                <div class="flex flex-col items-center text-text-secondary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span class="text-[10px] font-bold uppercase">{{ attr.fileName.split('.').pop() }}</span>
-                </div>
-                }
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-text-primary">Files đính kèm ({{ attachments.length }})</h3>
+            <button (click)="isAttachmentsExpanded = !isAttachmentsExpanded"
+              class="p-1 hover:bg-gray-100 rounded transition-colors text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-200"
+                [class.rotate-180]="!isAttachmentsExpanded" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
 
-                <!-- Overlay Actions -->
-                <div
-                  class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
-                  <a [href]="'https://localhost:44367/' + attr.filePath" [download]="attr.fileName" target="_blank"
-                    class="p-2 bg-white rounded-full text-text-primary hover:bg-primary hover:text-white transition-colors shadow-sm"
-                    title="Download">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+          <div *ngIf="isAttachmentsExpanded" class="animate-in fade-in slide-in-from-top-2 duration-200">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              @for (attr of attachments; track attr.issueAttachmentId) {
+              <div
+                class="flex flex-col border border-border rounded-lg overflow-hidden hover:shadow-md transition-all group">
+                <!-- Preview Area -->
+                <div class="h-32 bg-gray-50 flex items-center justify-center overflow-hidden relative">
+                  @if (isImage(attr.fileName)) {
+                  <img [src]="'https://localhost:44367/' + attr.filePath"
+                    class="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Attachment">
+                  } @else {
+                  <div class="flex flex-col items-center text-text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24"
                       stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                  </a>
-                  <button (click)="deleteAttachment(attr.issueAttachmentId || attr.issue_attachment_id)"
-                    class="p-2 bg-white rounded-full text-text-primary hover:bg-red-500 hover:text-white transition-colors shadow-sm"
-                    title="Delete">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                    <span class="text-[10px] font-bold uppercase">{{ attr.fileName.split('.').pop() }}</span>
+                  </div>
+                  }
+
+                  <!-- Overlay Actions -->
+                  <div
+                    class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                    <a [href]="'https://localhost:44367/' + attr.filePath" [download]="attr.fileName" target="_blank"
+                      class="p-2 bg-white rounded-full text-text-primary hover:bg-primary hover:text-white transition-colors shadow-sm"
+                      title="Download">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    </a>
+                    <button (click)="deleteAttachment(attr.issueAttachmentId || attr.issue_attachment_id)"
+                      class="p-2 bg-white rounded-full text-text-primary hover:bg-red-500 hover:text-white transition-colors shadow-sm"
+                      title="Delete">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- File Info -->
+                <div class="p-2 bg-white border-t border-border">
+                  <p class="text-[11px] font-semibold text-text-primary truncate" [title]="attr.fileName">{{
+                    attr.fileName
+                    }}</p>
+                  <p class="text-[9px] text-text-secondary">{{ attr.createdAt | date:'MMM d, y' }}</p>
                 </div>
               </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
 
-              <!-- File Info -->
-              <div class="p-2 bg-white border-t border-border">
-                <p class="text-[11px] font-semibold text-text-primary truncate" [title]="attr.fileName">{{ attr.fileName
-                  }}</p>
-                <p class="text-[9px] text-text-secondary">{{ attr.createdAt | date:'MMM d, y' }}</p>
+        @if (selectedIssueLinkedDetails.length > 0) {
+        <div class="mb-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              <h3 class="text-sm font-bold text-text-primary">Các Issue liên quan ({{ selectedIssueLinkedDetails.length
+                }})
+              </h3>
+            </div>
+            <button (click)="isLinkedIssuesExpanded = !isLinkedIssuesExpanded"
+              class="p-1 hover:bg-gray-100 rounded transition-colors text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-200"
+                [class.rotate-180]="!isLinkedIssuesExpanded" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+
+          <div *ngIf="isLinkedIssuesExpanded" class="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            @for (issue of selectedIssueLinkedDetails; track (issue.issueId || issue.issue_id)) {
+            <div (click)="selectIssue(issue)"
+              class="flex items-center justify-between p-3 bg-gray-50/50 hover:bg-blue-50 border border-border hover:border-primary/30 rounded-xl cursor-pointer transition-all group">
+              <div class="flex items-center space-x-3 overflow-hidden">
+                <span
+                  class="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded uppercase tracking-tighter shrink-0">{{
+                  issue.issueId || issue.issue_id }}</span>
+                <span
+                  class="text-sm font-semibold text-text-primary group-hover:text-primary transition-colors truncate">{{
+                  issue.issueName || issue.issue_name }}</span>
+              </div>
+              <div class="flex items-center space-x-3 shrink-0">
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase border bg-white"
+                  [ngClass]="getStatusClass(issue.issueStatus || issue.issue_status)">
+                  {{ issue.issueStatus || issue.issue_status }}
+                </span>
+                <div
+                  class="p-1 rounded-full bg-white border border-border group-hover:border-primary group-hover:text-primary transition-all shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
               </div>
             </div>
             }
@@ -477,7 +543,7 @@
                   </div>
                   }
                   @if (getHistoryDetails(item).length === 0) {
-                  <p class="text-xs text-text-secondary italic">Details updated</p>
+                  <p class="text-xs text-text-secondary italic">Không có thay đổi</p>
                   }
                 </div>
               </div>
@@ -494,7 +560,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <p class="text-lg font-medium">Select an issue to view details</p>
+        <p class="text-lg font-medium">Chọn một issue để xem chi tiết</p>
       </div>
       }
     </div>
@@ -511,7 +577,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            People
+            Người thực hiện
           </h3>
 
           <div class="space-y-4">
@@ -632,7 +698,7 @@
     <div class="flex-grow p-8 bg-gray-50 overflow-y-auto">
       <div class="max-w-5xl mx-auto space-y-8">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-text-primary">Backlog (by Epic)</h2>
+          <h2 class="text-2xl font-bold text-text-primary">Backlog (theo Epic)</h2>
         </div>
 
         @for (group of groupedIssues; track group.name) {
@@ -661,15 +727,7 @@
                   issue.issueName || issue.issue_name }}</span>
               </div>
               <div class="flex items-center space-x-4">
-                <!-- Issue Type Icon -->
-                <div
-                  [ngClass]="{'bg-[#e5493a]': (issue.issueType || issue.issue_type || '').toUpperCase() === 'BUG', 'bg-[#57d9a3]': (issue.issueType || issue.issue_type || '').toUpperCase() === 'STORY', 'bg-[#4bade8]': (issue.issueType || issue.issue_type || '').toUpperCase() !== 'BUG' && (issue.issueType || issue.issue_type || '').toUpperCase() !== 'STORY'}"
-                  class="w-4 h-4 rounded-sm flex items-center justify-center text-white text-[10px] shrink-0">
-                  <span *ngIf="(issue.issueType || issue.issue_type || '').toUpperCase() === 'BUG'">•</span>
-                  <span *ngIf="(issue.issueType || issue.issue_type || '').toUpperCase() === 'STORY'">★</span>
-                  <span
-                    *ngIf="(issue.issueType || issue.issue_type || '').toUpperCase() !== 'BUG' && (issue.issueType || issue.issue_type || '').toUpperCase() !== 'STORY'">✓</span>
-                </div>
+
                 <!-- Priority Icon -->
                 <span [ngClass]="getPriorityIcon(issue.issuePriorityId || issue.issue_priority_id)"
                   class="font-bold text-sm w-4 text-center">
@@ -706,8 +764,8 @@
       <div class="max-w-6xl mx-auto">
         <div class="flex justify-between items-center mb-8">
           <div>
-            <h2 class="text-2xl font-bold text-text-primary">Sprint Management</h2>
-            <p class="text-text-secondary text-sm">Create and manage your project sprints</p>
+            <h2 class="text-2xl font-bold text-text-primary">Quản lý Sprint</h2>
+            <p class="text-text-secondary text-sm">Tạo và quản lý sprint của dự án</p>
           </div>
           <button (click)="openCreateSprintModal()"
             class="bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-primary-hover shadow-md transition-all flex items-center">
@@ -715,7 +773,7 @@
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Create Sprint
+            Tạo Sprint
           </button>
         </div>
 
@@ -926,37 +984,105 @@
                 </svg>
                 Planning
               </h4>
-              <div class="grid grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Sprint</label>
-                  <select [(ngModel)]="newIssue.sprintId"
-                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                    <option value="">None</option>
-                    @for (sprint of sprints; track (sprint.sprintId || sprint.sprint_id)) {
-                    <option [value]="sprint.sprintId || sprint.sprint_id">{{ sprint.sprintName || sprint.sprint_name }}
-                    </option>
-                    }
-                  </select>
+
+              <div class="space-y-4">
+                <!-- Row 1: Sprint & Epic -->
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Sprint</label>
+                    <select [(ngModel)]="newIssue.sprintId"
+                      class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">None</option>
+                      @for (sprint of sprints; track (sprint.sprintId || sprint.sprint_id)) {
+                      <option [value]="sprint.sprintId || sprint.sprint_id">{{ sprint.sprintName || sprint.sprint_name
+                        }}
+                      </option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Epic</label>
+                    <select [(ngModel)]="newIssue.epicId"
+                      class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
+                      <option value="">None</option>
+                      @for (epic of epics; track epic.issue_id) {
+                      <option [value]="epic.issue_id">{{ epic.issue_name }} ({{ epic.issue_id }})</option>
+                      }
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Epic</label>
-                  <select [(ngModel)]="newIssue.epicId"
-                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                    <option value="">None</option>
-                    @for (epic of epics; track epic.issue_id) {
-                    <option [value]="epic.issue_id">{{ epic.issue_name }} ({{ epic.issue_id }})</option>
+
+                <!-- Row 2: Linked Issues -->
+                <div class="relative">
+                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Linked Issues</label>
+
+                  <div class="relative">
+                    <input type="text" [(ngModel)]="linkedIssueSearch" (focus)="isLinkedIssueDropdownOpen = true"
+                      placeholder="Search and link issues..."
+                      class="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary bg-white pr-10">
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- Selected Tags Display -->
+                  <div class="flex flex-wrap gap-1 mt-2">
+                    @for (id of linkedIssueIds; track id) {
+                    <span
+                      class="bg-blue-50 text-primary text-[10px] font-bold px-2 py-1 rounded-md border border-blue-100 flex items-center shadow-sm animate-in zoom-in-95 duration-200">
+                      {{ id }}
+                      <button (click)="removeLinkedIssue(id)"
+                        class="ml-1.5 text-blue-400 hover:text-red-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
                     }
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-text-secondary uppercase mb-2">Linked Issue</label>
-                  <select [(ngModel)]="newIssue.listIssues"
-                    class="w-full border border-border rounded-lg px-4 py-2 text-sm outline-none focus:border-primary bg-white">
-                    <option value="">Not linked</option>
-                    @for (issue of allProjectIssues; track issue.issue_id) {
-                    <option [value]="issue.issue_id">{{ issue.issue_id }} - {{ issue.issue_name }}</option>
-                    }
-                  </select>
+                  </div>
+
+                  <!-- Dropdown List -->
+                  <div *ngIf="isLinkedIssueDropdownOpen"
+                    class="absolute z-[110] left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-xl max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div class="p-1">
+                      <div (click)="isLinkedIssueDropdownOpen = false"
+                        class="p-2 text-[10px] font-bold text-primary hover:bg-gray-50 text-right cursor-pointer border-b border-gray-50">
+                        Close</div>
+                      @for (issue of filteredLinkedIssues; track issue.issue_id) {
+                      <div (click)="toggleLinkedIssue(issue.issue_id)"
+                        class="flex items-center px-3 py-2.5 hover:bg-gray-50 cursor-pointer rounded transition-colors group">
+                        <div [class.bg-primary]="isIssueLinked(issue.issue_id)"
+                          [class.border-primary]="isIssueLinked(issue.issue_id)"
+                          class="w-4 h-4 border-2 border-border rounded mr-3 flex items-center justify-center transition-colors">
+                          <svg *ngIf="isIssueLinked(issue.issue_id)" xmlns="http://www.w3.org/2000/svg"
+                            class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <div class="flex flex-col">
+                          <span class="text-xs font-bold text-text-primary group-hover:text-primary">{{ issue.issue_id
+                            }}</span>
+                          <span class="text-[10px] text-text-secondary truncate max-w-[250px]">{{ issue.issue_name
+                            }}</span>
+                        </div>
+                      </div>
+                      }
+                      @if (filteredLinkedIssues.length === 0) {
+                      <div class="p-4 text-center text-xs text-text-secondary italic">No issues found matching "{{
+                        linkedIssueSearch }}"</div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Backdrop to close dropdown -->
+                  <div *ngIf="isLinkedIssueDropdownOpen" (click)="isLinkedIssueDropdownOpen = false"
+                    class="fixed inset-0 z-[105]"></div>
                 </div>
               </div>
             </div>
@@ -1140,4 +1266,49 @@
     </div>
   </div>
   }
+
+  <!-- Custom Delete Confirmation Modal -->
+  <div *ngIf="isDeleteModalOpen" class="fixed inset-0 z-[110] overflow-y-auto" aria-labelledby="modal-title"
+    role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div (click)="closeDeleteModal()" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+        aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-border">
+        <div class="bg-white px-6 pt-5 pb-4 sm:p-8 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-bold text-text-primary" id="modal-title">
+                {{ deleteModalTitle }}
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-text-secondary">
+                  {{ deleteModalMessage }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-6 py-4 sm:px-8 sm:flex sm:flex-row-reverse gap-3">
+          <button type="button" (click)="confirmDelete()"
+            class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2 bg-red-600 text-sm font-bold text-white hover:bg-red-700 focus:outline-none sm:w-auto transition-all">
+            Xác nhận xóa
+          </button>
+          <button type="button" (click)="closeDeleteModal()"
+            class="mt-3 w-full inline-flex justify-center rounded-lg border border-border shadow-sm px-5 py-2 bg-white text-sm font-bold text-text-primary hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto transition-all">
+            Hủy bỏ
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>

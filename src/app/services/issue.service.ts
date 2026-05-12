@@ -57,7 +57,17 @@ export class IssueService {
   }
 
   updateIssue(issueId: string, issue: any): Observable<ApiResponse<any>> {
-    return this.http.put<ApiResponse<any>>(`/api/issues/${issueId}`, issue);
+    const formData = new FormData();
+    Object.keys(issue).forEach(key => {
+      if (issue[key] !== null && issue[key] !== undefined) {
+        if (issue[key] instanceof Date) {
+          formData.append(key, issue[key].toISOString());
+        } else {
+          formData.append(key, issue[key]);
+        }
+      }
+    });
+    return this.http.put<ApiResponse<any>>(`/api/issues/${issueId}`, formData);
   }
 
   updateDescription(issueId: string, formData: FormData): Observable<ApiResponse<any>> {

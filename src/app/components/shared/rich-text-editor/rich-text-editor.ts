@@ -119,8 +119,20 @@ export class RichTextEditorComponent implements OnChanges {
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files) {
+      let fileNames = '';
       for (let i = 0; i < files.length; i++) {
         this.selectedFiles.push(files[i]);
+        fileNames += ` [File: ${files[i].name}] `;
+      }
+      
+      // Append file names to the editor content if any files were added
+      if (fileNames) {
+        // Ensure there's a space or newline before appending if content isn't empty
+        const currentContent = this.editor.nativeElement.innerHTML;
+        if (currentContent && !currentContent.endsWith('&nbsp;') && !currentContent.endsWith(' ')) {
+          this.editor.nativeElement.innerHTML += '&nbsp;';
+        }
+        this.editor.nativeElement.innerHTML += fileNames;
       }
     }
     event.target.value = ''; // Reset input

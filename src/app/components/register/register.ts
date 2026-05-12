@@ -46,7 +46,7 @@ export class RegisterComponent {
       this.loading = true;
       
       const { fullname, email, username, password } = this.registerForm.value;
-      const registrationData = { fullname, email, username, password };
+      const registrationData = { fullname, email, username: username.toUpperCase(), password };
 
       this.authService.register(registrationData).subscribe({
         next: (response) => {

@@ -1,8 +1,8 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="mb-8 flex justify-between items-center">
     <div>
-      <h1 class="text-2xl font-bold text-text-primary">Projects</h1>
-      <p class="text-text-secondary mt-1 text-sm">A list of all projects you are involved in.</p>
+      <h1 class="text-2xl font-bold text-text-primary">Dự án</h1>
+      <p class="text-text-secondary mt-1 text-sm">Danh sách tất cả dự án bạn tham gia</p>
     </div>
   </div>
 
@@ -14,7 +14,9 @@
     <div class="flex">
       <div class="flex-shrink-0">
         <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+            clip-rule="evenodd" />
         </svg>
       </div>
       <div class="ml-3">
@@ -27,10 +29,10 @@
     <table class="w-full text-left text-sm">
       <thead>
         <tr class="text-text-secondary uppercase text-[10px] tracking-wider border-b border-border bg-gray-50">
-          <th class="px-6 py-4 font-bold">Project ID</th>
-          <th class="px-6 py-4 font-bold">Project Name</th>
-          <th class="px-6 py-4 font-bold">PM Name</th>
-          <th class="px-6 py-4 font-bold">Actions</th>
+          <th class="px-6 py-4 font-bold">Mã dự án</th>
+          <th class="px-6 py-4 font-bold">Tên dự án</th>
+          <th class="px-6 py-4 font-bold">PM</th>
+          <th class="px-6 py-4 font-bold">Hành động</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-border">
@@ -39,7 +41,8 @@
           <td class="px-6 py-4 text-text-primary font-medium">{{ project.projectName }}</td>
           <td class="px-6 py-4">
             <div class="flex items-center">
-              <div class="h-7 w-7 rounded-full bg-secondary flex items-center justify-center text-primary text-[10px] font-bold border border-primary/20 mr-2">
+              <div
+                class="h-7 w-7 rounded-full bg-secondary flex items-center justify-center text-primary text-[10px] font-bold border border-primary/20 mr-2">
                 {{ project.pmName.charAt(0) }}
               </div>
               <span class="text-text-primary">{{ project.pmName }}</span>
@@ -47,15 +50,34 @@
           </td>
           <td class="px-6 py-4">
             <div class="flex items-center space-x-2">
-              <button (click)="viewProjectDetails(project.projectId)" class="p-2 hover:bg-primary/10 rounded-full transition-all text-primary group-hover:scale-110" title="View Details">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <button (click)="viewProjectDetails(project.projectId)"
+                class="p-2 hover:bg-primary/10 rounded-full transition-all text-primary group-hover:scale-110"
+                title="Xem chi tiết">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </button>
-              <button (click)="viewProjectStatistics(project.projectId)" class="p-2 hover:bg-emerald-100 rounded-full transition-all text-emerald-600 group-hover:scale-110" title="Statistics">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <button (click)="viewProjectStatistics(project.projectId)"
+                *ngIf="currentUser?.adminYn || currentUser?.pmYn"
+                class="p-2 hover:bg-emerald-100 rounded-full transition-all text-emerald-600 group-hover:scale-110"
+                title="Thống kê">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </button>
+              <button (click)="openAssignModal(project.projectId)" *ngIf="currentUser?.adminYn || currentUser?.pmYn"
+                class="p-2 hover:bg-blue-100 rounded-full transition-all text-blue-600 group-hover:scale-110"
+                title="Assign Users">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
               </button>
             </div>
@@ -63,10 +85,86 @@
         </tr>
         <tr *ngIf="projects.length === 0">
           <td colspan="4" class="px-6 py-10 text-center text-text-secondary italic">
-            No projects found.
+            Không có dự án nào
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Assign Users Modal -->
+<div *ngIf="showAssignModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Overlay -->
+    <div (click)="closeAssignModal()" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+      aria-hidden="true"></div>
+
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+            <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+              Thêm thành viên vào dự án
+            </h3>
+            <div class="mt-4">
+              <p class="text-sm text-gray-500 mb-4">
+                Chọn thành viên để thêm vào dự án <strong>{{selectedProjectId}}</strong>.
+              </p>
+
+              <!-- Search Input -->
+              <div class="mb-3 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+
+                </div>
+                <input type="text" [(ngModel)]="userSearchTerm" placeholder="Search users by name or username..."
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-all">
+              </div>
+
+              <!-- Multi-select Dropdown/List -->
+              <div class="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
+                <div *ngFor="let user of filteredUsers" (click)="toggleUserSelection(user.userId)"
+                  class="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-0"
+                  [ngClass]="{'bg-blue-50': selectedUserIds.includes(user.userId)}">
+                  <div class="flex-shrink-0">
+                    <input type="checkbox" [checked]="selectedUserIds.includes(user.userId)"
+                      class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary pointer-events-none">
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900">{{user.fullname || user.username}}</p>
+                    <p class="text-xs text-gray-500">{{user.username}}</p>
+                  </div>
+                </div>
+                <div *ngIf="assignableUsers.length === 0" class="p-4 text-center text-sm text-gray-500">
+                  Không tìm thấy thành viên
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" (click)="assignUsers()" [disabled]="isAssigning || selectedUserIds.length === 0"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+          <span *ngIf="!isAssigning">Thêm thành viên ({{selectedUserIds.length}})</span>
+          <span *ngIf="isAssigning">Đang thêm...</span>
+        </button>
+        <button type="button" (click)="closeAssignModal()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Hủy
+        </button>
+      </div>
+    </div>
   </div>
 </div>
